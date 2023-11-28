@@ -32,7 +32,8 @@ public class AppointmentController : ControllerBase
                 DoctorId = reader.GetInt32("doctor_id"),
                 DepartmentId = reader.GetInt32("department_id"),
                 HospitalId = reader.GetInt32("hospital_id"),
-                AppointmentDateId = reader.GetDateTime("appointment_date"),
+                AppointmentDate = reader.GetDateTime("appointment_date"),
+                AppointmentDateEnd = reader.GetDateTime("appointment_date_end"),
 
             };
             appointments.Add(appointment);
@@ -56,7 +57,8 @@ public class AppointmentController : ControllerBase
         command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
         command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
         command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
-        command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDateId);
+        command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
+        command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
 
         try 
         {
