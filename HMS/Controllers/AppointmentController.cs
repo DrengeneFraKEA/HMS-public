@@ -4,6 +4,9 @@ using HMS.Models;
 using MySqlConnector;
 using Microsoft.Extensions.Options;
 using System.Data;
+using HMS.DTO;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace HMS.Controllers;
 
@@ -12,40 +15,38 @@ namespace HMS.Controllers;
 public class AppointmentController : ControllerBase
 {
     [HttpGet]
-    public IEnumerable<Appointment> GetAppointments()
+    public string GetAppointments()
     {
-        var appointments = new List<Appointment>();
+        var appointments = new List<DTO.Appointment>();
         MySQLContext mysql = new MySQLContext();
 
         mysql.Db.Open();
 
         using var command = new MySqlCommand("SELECT * FROM appointment;", mysql.Db);
         using var reader = command.ExecuteReader();
+        int id = 0;
         
         while (reader.Read())
         {
-            var appointment = new Appointment()
+            var appointment = new DTO.Appointment()
             {
-                AppointmentId = reader.GetInt32("id"),
-                PatientId = reader.GetInt32("patient_id"),
-                ClinicId = reader.IsDBNull("clinic_id") ? 0 : reader.GetInt32("clinic_id"),
-                DoctorId = reader.GetInt32("doctor_id"),
-                DepartmentId = reader.GetInt32("department_id"),
-                HospitalId = reader.GetInt32("hospital_id"),
-                AppointmentDate = reader.GetDateTime("appointment_date"),
-                AppointmentDateEnd = reader.GetDateTime("appointment_date_end"),
-
+                Id = id,
+                Place = "Guldbergsgade 29N", // Don't mind this for now.
+                Start = reader.GetDateTime("appointment_date"),
+                End = reader.GetDateTime("appointment_date_end"),
             };
+
+            id++;
             appointments.Add(appointment);
         }
 
         mysql.Db.Close();
 
-        return appointments;
+        return JsonSerializer.Serialize(appointments);
     }
 
     [HttpPost]
-    public IActionResult CreateAppointment([FromBody]Appointment appointment)
+    public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
     {
         MySQLContext mysql = new MySQLContext();
 
@@ -75,7 +76,7 @@ public class AppointmentController : ControllerBase
 
 
     [HttpPut]
-    public IActionResult UpdateAppointment([FromBody]Appointment appointment)
+    public IActionResult UpdateAppointment([FromBody]Models.Appointment appointment)
     {
         MySQLContext mysql = new MySQLContext();
 

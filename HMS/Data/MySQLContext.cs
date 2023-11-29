@@ -10,7 +10,7 @@ namespace HMS.Data
 
         public MySQLContext() 
         {
-            this.Db = new MySqlConnection("Server=hospitalmanagementsystem.mysql.database.azure.com; User ID=HospitalManagementSystemAdmin; Password=hms1234!; Database=HMS");
+            this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
 
         }
     }
