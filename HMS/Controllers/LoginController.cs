@@ -15,7 +15,7 @@ namespace KEA_Final1.Controllers
         {
             if (user.CheckUserCredentials(user) == false) return null; // Suspicious credentials provided.
 
-            MySQLContext mysql = new MySQLContext();
+            Database.MySQLContext mysql = new Database.MySQLContext();
 
             mysql.Db.Open();
 
@@ -36,7 +36,7 @@ namespace KEA_Final1.Controllers
 
             using(MySqlCommand cmd = new MySqlCommand()) 
             {
-                MySQLContext mysql = new MySQLContext();
+                Database.MySQLContext mysql = new Database.MySQLContext();
                 cmd.CommandText = $"SELECT * FROM accounts where username = {user.Username}";
                 cmd.Connection = mysql.Db;
 

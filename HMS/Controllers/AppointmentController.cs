@@ -7,6 +7,8 @@ using System.Data;
 using HMS.DTO;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace HMS.Controllers;
 
@@ -18,7 +20,7 @@ public class AppointmentController : ControllerBase
     public string GetAppointments()
     {
         var appointments = new List<DTO.Appointment>();
-        MySQLContext mysql = new MySQLContext();
+        Database.MySQLContext mysql = new Database.MySQLContext();
 
         mysql.Db.Open();
 
@@ -48,7 +50,7 @@ public class AppointmentController : ControllerBase
     [HttpPost]
     public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
     {
-        MySQLContext mysql = new MySQLContext();
+        Database.MySQLContext mysql = new Database.MySQLContext();
 
         mysql.Db.Open();
         using var command = new MySqlCommand("CreateAppointment", mysql.Db);
@@ -78,7 +80,7 @@ public class AppointmentController : ControllerBase
     [HttpPut]
     public IActionResult UpdateAppointment([FromBody]Models.Appointment appointment)
     {
-        MySQLContext mysql = new MySQLContext();
+        Database.MySQLContext mysql = new Database.MySQLContext();
 
         mysql.Db.Open();
         using var command = new MySqlCommand("UpdateAppointment", mysql.Db);
@@ -109,7 +111,7 @@ public class AppointmentController : ControllerBase
     [HttpDelete("{appointmentId}")]
     public IActionResult DeleteAppointment(int appointmentId)
     {
-        MySQLContext mysql = new MySQLContext();
+        Database.MySQLContext mysql = new Database.MySQLContext();
 
         mysql.Db.Open();
         using var command = new MySqlCommand("DELETE FROM hms.appointment WHERE id = @appointmentId;", mysql.Db);
@@ -126,5 +128,34 @@ public class AppointmentController : ControllerBase
             mysql.Db.Close();
             return BadRequest("Failed to delete appointment " + ex.Message);
         }
+    }
+
+    [HttpGet("Test")]
+    public string Test() 
+    {
+        switch (Database.SelectedDatabase) 
+        {
+            case 0:
+                // Hent med mysql..
+
+                Database.MySQLContext mysql = new Database.MySQLContext();
+
+                break;
+            case 1:
+                // Hent med mongo db..
+
+                Database.MongoDbContext mdbc = new Database.MongoDbContext();
+                MongoClient mc = new MongoClient(mdbc.ConnectionString);
+
+                var result = mc.GetDatabase("HMS").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
+
+                return result.ToString();
+            case 2:
+
+                // Hent med graphql
+                break;
+        }
+
+        return string.Empty;
     }
 }

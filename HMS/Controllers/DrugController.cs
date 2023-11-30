@@ -15,7 +15,7 @@ public class DrugController : ControllerBase
     public IEnumerable<Drug> GetDrugs()
     {
         var drugs = new List<Drug>();
-        MySQLContext mysql = new MySQLContext();
+        Database.MySQLContext mysql = new Database.MySQLContext();
 
         mysql.Db.Open();
 
@@ -43,7 +43,7 @@ public class DrugController : ControllerBase
     public IEnumerable<Drug_Prescription> GetDrugsWithPrescriptions()
     {
         var drug_prescriptions = new List<Drug_Prescription>();
-        MySQLContext mysql = new MySQLContext();
+        Database.MySQLContext mysql = new Database.MySQLContext();
         mysql.Db.Open();
 
         using var command = new MySqlCommand("SELECT * FROM drug_prescription;", mysql.Db);
