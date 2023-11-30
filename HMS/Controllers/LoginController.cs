@@ -1,5 +1,7 @@
 ﻿using HMS.Data;
 using HMS.DTO;
+using HMS.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
@@ -10,8 +12,15 @@ namespace KEA_Final1.Controllers
     [Route("[controller]")]
     public class LoginController : ControllerBase
     {
+        private readonly JwtTokenGenerator jwtTokenGenerator;
+
+        public LoginController(IConfiguration configuration)
+        {
+            jwtTokenGenerator = new JwtTokenGenerator(configuration);
+        }
+        [AllowAnonymous]
         [HttpPost]
-        public bool? LogIn([FromBody]Account user) 
+        public string LogIn([FromBody]Account user) 
         {
             if (user.CheckUserCredentials(user) == false) return null; // Suspicious credentials provided.
 
@@ -25,8 +34,16 @@ namespace KEA_Final1.Controllers
             
             mysql.Db.Close();
 
-            return userExists;
+            if (userExists)
+            {
+                return jwtTokenGenerator.GenerateToken(user.Username, "User");
+            }
+            
+
+
+            return string.Empty;
         }
+
 
         [HttpPost]
         [Route("register")]
