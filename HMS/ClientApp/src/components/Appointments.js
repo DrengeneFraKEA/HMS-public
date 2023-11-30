@@ -19,6 +19,9 @@ export class Appointments extends Component {
 
         try {
             axios.get("appointment", {
+                headers: {
+                    Authorization: localStorage.getItem('token')
+                    }
             })
                 .then(response => {
                     const appointments = response.data; // Access the list of appointments

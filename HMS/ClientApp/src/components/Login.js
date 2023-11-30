@@ -9,6 +9,7 @@ export class Login extends Component {
     static displayName = Login.name;
     submitLinkRef = React.createRef();
 
+
     handleSubmit = async (e) => {
         e.preventDefault();
         var username = $('#username').val();
@@ -20,8 +21,12 @@ export class Login extends Component {
                 password: password
             });
 
-            if (response.data === true) {
-
+            if (response.data != "") {
+                var token = "Bearer " + response.data
+                localStorage.setItem('token', token); 
+                this.setState({
+                    token
+                });
                 this.submitLinkRef.current.click();
 
             }

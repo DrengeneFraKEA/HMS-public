@@ -7,6 +7,8 @@ using System.Data;
 using HMS.DTO;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
+using HMS.Utils;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
@@ -16,9 +18,12 @@ namespace HMS.Controllers;
 [Route("[controller]")]
 public class AppointmentController : ControllerBase
 {
+
+    [Authorize]
     [HttpGet]
     public string GetAppointments()
     {
+
         var appointments = new List<DTO.Appointment>();
         Database.MySQLContext mysql = new Database.MySQLContext();
 
@@ -44,8 +49,10 @@ public class AppointmentController : ControllerBase
 
         mysql.Db.Close();
 
+
         return JsonSerializer.Serialize(appointments);
     }
+
 
     [HttpPost]
     public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
