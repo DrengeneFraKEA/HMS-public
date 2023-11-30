@@ -4,6 +4,9 @@ using HMS.Models;
 using MySqlConnector;
 using Microsoft.Extensions.Options;
 using System.Data;
+using HMS.DTO;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace HMS.Controllers;
 
@@ -12,39 +15,38 @@ namespace HMS.Controllers;
 public class AppointmentController : ControllerBase
 {
     [HttpGet]
-    public IEnumerable<Appointment> GetAppointments()
+    public string GetAppointments()
     {
-        var appointments = new List<Appointment>();
+        var appointments = new List<DTO.Appointment>();
         MySQLContext mysql = new MySQLContext();
 
         mysql.Db.Open();
 
         using var command = new MySqlCommand("SELECT * FROM appointment;", mysql.Db);
         using var reader = command.ExecuteReader();
+        int id = 0;
         
         while (reader.Read())
         {
-            var appointment = new Appointment()
+            var appointment = new DTO.Appointment()
             {
-                AppointmentId = reader.GetInt32("id"),
-                PatientId = reader.GetInt32("patient_id"),
-                ClinicId = reader.IsDBNull("clinic_id") ? 0 : reader.GetInt32("clinic_id"),
-                DoctorId = reader.GetInt32("doctor_id"),
-                DepartmentId = reader.GetInt32("department_id"),
-                HospitalId = reader.GetInt32("hospital_id"),
-                AppointmentDateId = reader.GetDateTime("appointment_date"),
-
+                Id = id,
+                Place = "Guldbergsgade 29N", // Don't mind this for now.
+                Start = reader.GetDateTime("appointment_date"),
+                End = reader.GetDateTime("appointment_date_end"),
             };
+
+            id++;
             appointments.Add(appointment);
         }
 
         mysql.Db.Close();
 
-        return appointments;
+        return JsonSerializer.Serialize(appointments);
     }
 
     [HttpPost]
-    public IActionResult CreateAppointment([FromBody]Appointment appointment)
+    public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
     {
         MySQLContext mysql = new MySQLContext();
 
@@ -56,7 +58,8 @@ public class AppointmentController : ControllerBase
         command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
         command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
         command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
-        command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDateId);
+        command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
+        command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
 
         try 
         {
@@ -68,6 +71,60 @@ public class AppointmentController : ControllerBase
         {
             mysql.Db.Close();
             return BadRequest("Failed to create appointment "+ex.Message);
+        }
+    }
+
+
+    [HttpPut]
+    public IActionResult UpdateAppointment([FromBody]Models.Appointment appointment)
+    {
+        MySQLContext mysql = new MySQLContext();
+
+        mysql.Db.Open();
+        using var command = new MySqlCommand("UpdateAppointment", mysql.Db);
+        command.CommandType = CommandType.StoredProcedure;
+
+        command.Parameters.AddWithValue("a_appointment_id", appointment.AppointmentId);
+        command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
+        command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
+        command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
+        command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
+        command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
+        command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
+
+        try
+        {
+            command.ExecuteNonQuery();
+            mysql.Db.Close();
+            return Ok("Appointment updated successfully");
+        }
+        catch (Exception ex)
+        {
+            mysql.Db.Close();
+            return BadRequest("Failed to update appointment " + ex.Message);
+        }
+    }
+
+
+    [HttpDelete("{appointmentId}")]
+    public IActionResult DeleteAppointment(int appointmentId)
+    {
+        MySQLContext mysql = new MySQLContext();
+
+        mysql.Db.Open();
+        using var command = new MySqlCommand("DELETE FROM hms.appointment WHERE id = @appointmentId;", mysql.Db);
+        command.Parameters.AddWithValue("@appointmentId", appointmentId);
+
+        try
+        {
+            command.ExecuteNonQuery();
+            mysql.Db.Close();    
+            return Ok("Appointment deleted successfully");
+        }
+        catch (Exception ex)
+        {
+            mysql.Db.Close();
+            return BadRequest("Failed to delete appointment " + ex.Message);
         }
     }
 }

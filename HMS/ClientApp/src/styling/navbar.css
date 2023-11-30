@@ -1,0 +1,27 @@
+﻿.navbar {
+    background-color: #333;
+    padding: 10px 0;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar-link {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.navbar-link:first-child {
+    margin-right: auto;
+}
+
+.navbar-link:last-child {
+    margin-left: auto;
+}
+
+.navbar-link:hover {
+    background-color: #555;
+}
