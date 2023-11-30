@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "clinic_id": 1,
+  "persondata": {
+    "id": 5,
+    "first_name": "Kristian",
+    "last_name": "Hjelmsmark",
+    "contact_number": "99999999",
+    "cpr": "1234567891",
+    "address": "Guldbergsgade 29N, 2000"
+  }
+}

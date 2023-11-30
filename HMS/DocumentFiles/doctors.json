@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "persondata": {
+    "id": 6,
+    "first_name": "Abdi",
+    "last_name": "Mohamed",
+    "contact_number": "99999991",
+    "cpr": "1234567881",
+    "address": "Guldbergsgade 29N, 2000"
+  }
+}

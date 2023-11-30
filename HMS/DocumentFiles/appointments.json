@@ -1,0 +1,28 @@
+{
+  "patient": {
+    "id": 1,
+    "appointment": [
+      {
+        "appointment_id": 1,
+        "appointment_date": "2023-09-20T10:00:00",
+        "appointment_date_end": "2023-09-20T10:00:00",
+        "clinic": {
+          "id": 1,
+          "name": "Pia Tønners klinik",
+          "department": "Ørelæge",
+          "doctor": { 
+            "id": 1
+          }
+        },
+        "hospital": {
+          "hospital_id": "",
+          "name": "",
+          "deparment": "",
+          "doctor": {
+            "id": ""
+          }
+        }
+      }
+    ]
+  }
+}
