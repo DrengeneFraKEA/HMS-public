@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "doctor_id": 5,
+  "journalnotes": "Testing journal",
+  "appointment": {
+    "id": 1
+  },
+  "patient": {
+    "id": 1
+  }
+}

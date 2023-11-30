@@ -6,10 +6,10 @@ public class Appointment
 {
     public int AppointmentId { get; set; }
     public int PatientId { get; set; }
-    public int ClinicId { get; set; }
+    public int? ClinicId { get; set; }
     public int DoctorId { get; set; }
     public int DepartmentId { get; set; }
-    public int HospitalId { get; set; }
+    public int? HospitalId { get; set; }
     public DateTime AppointmentDate { get; set; }
     public DateTime AppointmentDateEnd { get; set; }
 

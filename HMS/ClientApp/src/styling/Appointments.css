@@ -1,0 +1,29 @@
+﻿.appointments-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+}
+
+.appointments-container {
+    margin-top: 15px;
+}
+
+.appointment-header {
+    display: flex;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+}
+
+.column {
+    flex: 1;
+    padding: 8px;
+}
+
+.appointment-item {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
