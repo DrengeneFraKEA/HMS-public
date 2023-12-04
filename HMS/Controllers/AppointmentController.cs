@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using HMS.Utils;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using HMS.Services;
 
 namespace HMS.Controllers;
 
@@ -19,66 +20,34 @@ namespace HMS.Controllers;
 public class AppointmentController : ControllerBase
 {
 
+    private readonly AppointmentService appointmentService;
+    public AppointmentController(AppointmentService service)
+    {
+        appointmentService = service;
+    }
+
     [Authorize]
     [HttpGet]
     public string GetAppointments()
     {
 
-        var appointments = new List<DTO.Appointment>();
-        Database.MySQLContext mysql = new Database.MySQLContext();
+        var appointments = appointmentService.GetAppointments();
 
-        mysql.Db.Open();
-
-        using var command = new MySqlCommand("SELECT * FROM appointment;", mysql.Db);
-        using var reader = command.ExecuteReader();
-        int id = 0;
-        
-        while (reader.Read())
-        {
-            var appointment = new DTO.Appointment()
-            {
-                Id = id,
-                Place = "Guldbergsgade 29N", // Don't mind this for now.
-                Start = reader.GetDateTime("appointment_date"),
-                End = reader.GetDateTime("appointment_date_end"),
-            };
-
-            id++;
-            appointments.Add(appointment);
-        }
-
-        mysql.Db.Close();
-
-
-        return JsonSerializer.Serialize(appointments);
+        return appointments;
+       
     }
 
 
     [HttpPost]
     public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
     {
-        Database.MySQLContext mysql = new Database.MySQLContext();
-
-        mysql.Db.Open();
-        using var command = new MySqlCommand("CreateAppointment", mysql.Db);
-        command.CommandType = CommandType.StoredProcedure;
-
-        command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
-        command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
-        command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
-        command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
-        command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
-        command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
-
         try 
         {
-            command.ExecuteNonQuery();
-            mysql.Db.Close();
+            appointmentService.CreateAppointment(appointment);
             return Ok("Appointment created successfully");
         }
         catch (Exception ex) 
         {
-            mysql.Db.Close();
             return BadRequest("Failed to create appointment "+ex.Message);
         }
     }
@@ -87,29 +56,13 @@ public class AppointmentController : ControllerBase
     [HttpPut]
     public IActionResult UpdateAppointment([FromBody]Models.Appointment appointment)
     {
-        Database.MySQLContext mysql = new Database.MySQLContext();
-
-        mysql.Db.Open();
-        using var command = new MySqlCommand("UpdateAppointment", mysql.Db);
-        command.CommandType = CommandType.StoredProcedure;
-
-        command.Parameters.AddWithValue("a_appointment_id", appointment.AppointmentId);
-        command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
-        command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
-        command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
-        command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
-        command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
-        command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
-
         try
         {
-            command.ExecuteNonQuery();
-            mysql.Db.Close();
+            appointmentService.UpdateAppointment(appointment);
             return Ok("Appointment updated successfully");
         }
         catch (Exception ex)
         {
-            mysql.Db.Close();
             return BadRequest("Failed to update appointment " + ex.Message);
         }
     }
@@ -118,21 +71,13 @@ public class AppointmentController : ControllerBase
     [HttpDelete("{appointmentId}")]
     public IActionResult DeleteAppointment(int appointmentId)
     {
-        Database.MySQLContext mysql = new Database.MySQLContext();
-
-        mysql.Db.Open();
-        using var command = new MySqlCommand("DELETE FROM hms.appointment WHERE id = @appointmentId;", mysql.Db);
-        command.Parameters.AddWithValue("@appointmentId", appointmentId);
-
         try
         {
-            command.ExecuteNonQuery();
-            mysql.Db.Close();    
+            appointmentService.DeleteAppointment(appointmentId);
             return Ok("Appointment deleted successfully");
         }
         catch (Exception ex)
         {
-            mysql.Db.Close();
             return BadRequest("Failed to delete appointment " + ex.Message);
         }
     }

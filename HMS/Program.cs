@@ -1,4 +1,5 @@
 using HMS.Data;
+using HMS.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MySqlConnector;
@@ -34,6 +35,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<AppointmentService>();
 
 
 var app = builder.Build();
