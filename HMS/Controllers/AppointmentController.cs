@@ -41,11 +41,7 @@ public class AppointmentController : ControllerBase
     [HttpGet("patient/{patientId}")]
     public string GetAppointmentsByPatientId(int patientId)
     {
-
-        var appointments = appointmentService.GetAppointmentsByPatientId(patientId);
-
-        return appointments;
-
+        return appointmentService.GetAppointmentsByPatientId(patientId);
     }
 
 
