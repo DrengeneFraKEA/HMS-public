@@ -37,6 +37,17 @@ public class AppointmentController : ControllerBase
        
     }
 
+    [Authorize]
+    [HttpGet("patient/{patientId}")]
+    public string GetAppointmentsByPatientId(int patientId)
+    {
+
+        var appointments = appointmentService.GetAppointmentsByPatientId(patientId);
+
+        return appointments;
+
+    }
+
 
     [HttpPost]
     public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
@@ -68,7 +79,7 @@ public class AppointmentController : ControllerBase
     }
 
 
-    [HttpDelete("{appointmentId}")]
+    [HttpDelete("delete/{appointmentId}")]
     public IActionResult DeleteAppointment(int appointmentId)
     {
         try

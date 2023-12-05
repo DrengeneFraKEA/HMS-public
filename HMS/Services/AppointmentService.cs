@@ -1,5 +1,6 @@
 ﻿using HMS.Data;
 using HMS.DTO;
+using HMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using System.Data;
@@ -13,31 +14,57 @@ namespace HMS.Services
         public string GetAppointments()
         {
 
-            var appointments = new List<Appointment>();
+            var appointments = new List<DTO.Appointment>();
             Database.MySQLContext mysql = new Database.MySQLContext();
 
             mysql.Db.Open();
 
-            using var command = new MySqlCommand("SELECT * FROM appointment;", mysql.Db);
+            using var command = new MySqlCommand("SELECT * FROM appointment a JOIN hospital h on h.id = a.hospital_id;", mysql.Db);
             using var reader = command.ExecuteReader();
-            int id = 0;
+
         
             while (reader.Read())
             {
                 var appointment = new DTO.Appointment()
                 {
-                    Id = id,
-                    Place = "Guldbergsgade 29N", // Don't mind this for now.
+                    Id = reader.GetInt32("id"),
+                    Place = reader.GetString("name"),
                     Start = reader.GetDateTime("appointment_date"),
                     End = reader.GetDateTime("appointment_date_end"),
                 };
 
-                id++;
                 appointments.Add(appointment);
             }
 
             mysql.Db.Close();
 
+            return JsonSerializer.Serialize(appointments);
+        }
+
+        public string GetAppointmentsByPatientId(int patientId)
+        {
+            var appointments = new List<DTO.Appointment>();
+            Database.MySQLContext mysql = new Database.MySQLContext();
+
+            mysql.Db.Open();
+            using var command = new MySqlCommand("SELECT * FROM hms.appointment a JOIN hospital h on h.id = a.hospital_id WHERE patient_id = @patientId;", mysql.Db);
+            command.Parameters.AddWithValue("@patientId", patientId);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                var appointment = new DTO.Appointment()
+                {
+                    Id = reader.GetInt32("id"),
+                    Place = reader.GetString("name"),
+                    Start = reader.GetDateTime("appointment_date"),
+                    End = reader.GetDateTime("appointment_date_end"),
+                };
+
+                appointments.Add(appointment);
+            }
+
+            mysql.Db.Close();
             return JsonSerializer.Serialize(appointments);
         }
 
