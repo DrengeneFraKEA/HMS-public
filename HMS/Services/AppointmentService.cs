@@ -63,10 +63,10 @@ namespace HMS.Services
                     var result = documents.Select(appointment => new DTO.Appointment
                     {
                         Id = appointment.AppointmentId,
-                        Place = appointment.Clinic?.Name,
+                        Place = appointment.Clinic?.Name != null ? appointment.Clinic.Name : appointment.Hospital.Name,
                         Start = appointment.AppointmentDate,
                         End = appointment.AppointmentDateEnd
-                    }).ToList();
+                    }).ToList(); 
 
                     return JsonSerializer.Serialize(result);
                 case 2:
@@ -120,9 +120,17 @@ namespace HMS.Services
                     var database = mc.GetDatabase("HMS");
                     var appointmentCollection = database.GetCollection<Models.Appointment>("appointments");
 
-                    var filter = Builders<Models.Appointment>.Filter.Eq(a => a.Patient.PatientId, patientId); // Builders<Models.Appointment>.Filter.Gt(a => a.AppointmentId, 0);
-                    var document = appointmentCollection.Find(filter).FirstOrDefault();
-                    return JsonSerializer.Serialize(document);
+                    var filter = Builders<Models.Appointment>.Filter.Eq(a => a.Patient.PatientId, patientId) & Builders<Models.Appointment>.Filter.Gt(a => a.AppointmentId, 0);
+                    var documents = appointmentCollection.Find(filter).ToList();
+
+                    var result = documents.Select(appointment => new DTO.Appointment
+                    {
+                        Id = appointment.AppointmentId,
+                        Place = appointment.Clinic?.Name != "" ? appointment.Clinic.Name : appointment.Hospital.Name,
+                        Start = appointment.AppointmentDate,
+                        End = appointment.AppointmentDateEnd
+                    }).ToList();
+                    return JsonSerializer.Serialize(result);
 
                 case 2:
 
@@ -135,54 +143,134 @@ namespace HMS.Services
 
         public void CreateAppointment(Models.Appointment appointment)
         {
-            Database.MySQLContext mysql = new Database.MySQLContext();
 
-            mysql.Db.Open();
-            using var command = new MySqlCommand("CreateAppointment", mysql.Db);
-            command.CommandType = CommandType.StoredProcedure;
+            switch (Database.SelectedDatabase)
+            {
+                case 0:
+                    // Hent med mysql..
+                    Database.MySQLContext mysql = new Database.MySQLContext();
 
-            command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
-            command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
-            command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
-            command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
-            command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
-            command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
-            
-            command.ExecuteNonQuery();
-            mysql.Db.Close();
+                    mysql.Db.Open();
+                    var command = new MySqlCommand("CreateAppointment", mysql.Db);
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
+                    command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
+                    command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
+                    command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
+                    command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
+                    command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
+
+                    command.ExecuteNonQuery();
+                    mysql.Db.Close();
+                    break;
+                case 1:
+                    // Hent med mongo db..
+                    Database.MongoDbContext mdbc = new Database.MongoDbContext();
+                    MongoClient mc = new MongoClient(mdbc.ConnectionString);
+
+                    var database = mc.GetDatabase("HMS");
+                    var appointmentCollection = database.GetCollection<Models.Appointment>("appointments");
+
+                    
+                    appointmentCollection.InsertOne(appointment);
+                    break;
+
+                case 2:
+
+                    // Hent med graphql
+                    break;
+            }
         }
 
         public void UpdateAppointment(Models.Appointment appointment)
         {
-            Database.MySQLContext mysql = new Database.MySQLContext();
-      
-            mysql.Db.Open();
-            using var command = new MySqlCommand("UpdateAppointment", mysql.Db);
-            command.CommandType = CommandType.StoredProcedure;
 
-            command.Parameters.AddWithValue("a_appointment_id", appointment.AppointmentId);
-            command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
-            command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
-            command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
-            command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
-            command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
-            command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
-           
-            command.ExecuteNonQuery();
-            mysql.Db.Close();
+            switch (Database.SelectedDatabase)
+            {
+                case 0:
+                    // Hent med mysql..
+                    Database.MySQLContext mysql = new Database.MySQLContext();
+
+                    mysql.Db.Open();
+                    var command = new MySqlCommand("UpdateAppointment", mysql.Db);
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.AddWithValue("a_appointment_id", appointment.AppointmentId);
+                    command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
+                    command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
+                    command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
+                    command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
+                    command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
+                    command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
+
+                    command.ExecuteNonQuery();
+                    mysql.Db.Close();
+                    break;
+                case 1:
+                    // Hent med mongo db..
+                    Database.MongoDbContext mdbc = new Database.MongoDbContext();
+                    MongoClient mc = new MongoClient(mdbc.ConnectionString);
+
+                    var database = mc.GetDatabase("HMS");
+                    var appointmentCollection = database.GetCollection<Models.Appointment>("appointments");
+
+                    var filter = Builders<Models.Appointment>.Filter.Eq(a => a.AppointmentId, appointment.AppointmentId);
+                    var update = Builders<Models.Appointment>.Update
+                        .Set(a => a.PatientId, appointment.PatientId)
+                        .Set(a => a.DoctorId, appointment.DoctorId)
+                        .Set(a => a.DepartmentId, appointment.DepartmentId)
+                        .Set(a => a.Clinic, appointment.Clinic) 
+                        .Unset(a => a.HospitalId) 
+                        .Set(a => a.AppointmentDate, appointment.AppointmentDate)
+                        .Set(a => a.AppointmentDateEnd, appointment.AppointmentDateEnd);
+
+                    appointmentCollection.UpdateOne(filter, update);
+
+                    break;
+
+                case 2:
+
+                    // Hent med graphql
+                    break;
+            }
            
         }
 
         public void DeleteAppointment(int appointmentId)
         {
-            Database.MySQLContext mysql = new Database.MySQLContext();
 
-            mysql.Db.Open();
-            using var command = new MySqlCommand("DELETE FROM hms.appointment WHERE id = @appointmentId;", mysql.Db);
-            command.Parameters.AddWithValue("@appointmentId", appointmentId);
+            switch (Database.SelectedDatabase)
+            {
+                case 0:
+                    // Hent med mysql..
+                    Database.MySQLContext mysql = new Database.MySQLContext();
 
-            command.ExecuteNonQuery();
-            mysql.Db.Close();
+                    mysql.Db.Open();
+                    var command = new MySqlCommand("DELETE FROM hms.appointment WHERE id = @appointmentId;", mysql.Db);
+                    command.Parameters.AddWithValue("@appointmentId", appointmentId);
+
+                    command.ExecuteNonQuery();
+                    mysql.Db.Close();
+                    break;
+                case 1:
+                    // Hent med mongo db..
+                    Database.MongoDbContext mdbc = new Database.MongoDbContext();
+                    MongoClient mc = new MongoClient(mdbc.ConnectionString);
+
+                    var database = mc.GetDatabase("HMS");
+                    var appointmentCollection = database.GetCollection<Models.Appointment>("appointments");
+
+                    var filter = Builders<Models.Appointment>.Filter.Eq(a => a.AppointmentId, appointmentId);
+
+                    appointmentCollection.DeleteOne(filter);
+                    break;
+
+                case 2:
+
+                    // Hent med graphql
+                    break;
+            }
         }
     }
 }

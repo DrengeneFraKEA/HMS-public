@@ -32,6 +32,9 @@ public class Appointment
     [BsonElement("clinic")]
     public Clinic Clinic { get; set; }
 
+    [BsonElement("hospital")]
+    public Hospital Hospital { get; set; }
+
 
 
 
