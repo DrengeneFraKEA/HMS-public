@@ -3,7 +3,12 @@ using HMS.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MySqlConnector;
+using System.Net;
+using System;
 using System.Text.Json;
+using MongoDB.Bson.IO;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace HMS.Services;
 
@@ -12,7 +17,6 @@ public class DrugService
 
     public string GetDrugs()
     {
-
         switch (Database.SelectedDatabase)
         {
             case 0:
@@ -61,5 +65,41 @@ public class DrugService
         return string.Empty;
     }
 
+    /// <summary>
+    /// Uses external api: https://lhncbc.nlm.nih.gov/RxNav/APIs/RxNormAPIs.html
+    /// </summary>
+    /// <param name="drugsearch"></param>
+    /// <returns></returns>
+    public string GetDrugByName(string drugsearch) 
+    {
+        List<DTO.Drug> drugs = new List<DTO.Drug>();
+
+        using (HttpClient client = new HttpClient())
+        {
+            string result = client.GetStringAsync($"https://rxnav.nlm.nih.gov/REST/drugs.json?name={drugsearch}").Result;
+            
+            if (result != string.Empty) 
+            {
+                JObject jsonObject = JObject.Parse(result);
+
+                JArray conceptProperties = (JArray)jsonObject?["drugGroup"]?["conceptGroup"]?[1]?["conceptProperties"];
+                if (conceptProperties == null) return JsonSerializer.Serialize(drugs); // No results found. Return empty list.
+
+                foreach (var conceptProperty in conceptProperties)
+                {
+                    DTO.Drug drug = new DTO.Drug()
+                    {
+                        Id = (int)conceptProperty["rxcui"],
+                        Name = (string)conceptProperty["synonym"]
+                    };
+
+                    if (drug.Name != string.Empty)
+                        drugs.Add(drug);
+                }
+            }
+        }
+
+        return JsonSerializer.Serialize(drugs);
+    }
 }
 
