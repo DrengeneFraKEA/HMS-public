@@ -37,6 +37,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<AppointmentService>();
 
+builder.Services.AddScoped<DrugService>();
+
 
 var app = builder.Build();
 

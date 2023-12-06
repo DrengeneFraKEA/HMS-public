@@ -4,6 +4,7 @@ using HMS.Models;
 
 using MySqlConnector;
 using Microsoft.Extensions.Options;
+using HMS.Services;
 
 namespace HMS.Controllers;
 
@@ -11,30 +12,16 @@ namespace HMS.Controllers;
 [Route("[controller]")]
 public class DrugController : ControllerBase
 {
-    [HttpGet("drugs")]
-    public IEnumerable<Drug> GetDrugs()
+    private readonly DrugService drugService;
+    public DrugController(DrugService service)
     {
-        var drugs = new List<Drug>();
-        Database.MySQLContext mysql = new Database.MySQLContext();
+        drugService = service;
+    }
 
-        mysql.Db.Open();
-
-        using var command = new MySqlCommand("SELECT * FROM drug;", mysql.Db);
-        using var reader = command.ExecuteReader();
-        
-        while (reader.Read())
-        {
-            var drug = new Drug()
-            {
-                DrugId = reader.GetInt32("id"),
-                Name = reader.GetString("name"),
-                SideEffects = reader.GetString("sideeffects"),
-
-            };
-            drugs.Add(drug);
-        }
-
-        mysql.Db.Close();
+    [HttpGet("drugs")]
+    public string GetDrugs()
+    {
+       var drugs = drugService.GetDrugs();
 
         return drugs;
     }
