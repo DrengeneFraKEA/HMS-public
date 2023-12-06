@@ -5,6 +5,7 @@ using HMS.Models;
 using MySqlConnector;
 using Microsoft.Extensions.Options;
 using HMS.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HMS.Controllers;
 
@@ -21,9 +22,14 @@ public class DrugController : ControllerBase
     [HttpGet("drugs")]
     public string GetDrugs()
     {
-       var drugs = drugService.GetDrugs();
+        return drugService.GetDrugs();
+    }
 
-        return drugs;
+    [Authorize]
+    [HttpGet("{drugsearch}")]
+    public string GetDrugByName(string drugsearch) 
+    {
+        return drugService.GetDrugByName(drugsearch);
     }
 
     [HttpGet("drug_prescriptions")]
@@ -51,5 +57,4 @@ public class DrugController : ControllerBase
 
         return drug_prescriptions;
     }
-
 }
