@@ -16,12 +16,11 @@ export class Appointments extends Component {
 
     componentDidMount() {
         // Fetch appointments data
-
         try {
-            axios.get("appointment", {
-                headers: {
-                    Authorization: localStorage.getItem('token')
-                    }
+            var request = "appointment/patient/" + localStorage.getItem('userid');
+
+            axios.get(request, {
+                headers: { "Authorization": localStorage.getItem('token') }
             })
                 .then(response => {
                     const appointments = response.data; // Access the list of appointments

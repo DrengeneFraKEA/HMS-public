@@ -21,12 +21,20 @@ export class Login extends Component {
                 password: password
             });
 
-            if (response.data != "") {
-                var token = "Bearer " + response.data
+            if (response.data !== "") {
+
+                // Sucessful login. Save token, userid and role into localstorage/browser storage
+                var token = "Bearer " + response.data["Token"];
+
                 localStorage.setItem('token', token); 
-                this.setState({
-                    token
-                });
+                this.setState({ token });
+
+                localStorage.setItem('userid', response.data["UserId"]);
+                this.setState({ token });
+
+                localStorage.setItem('role', response.data["Role"]);
+                this.setState({ token });
+
                 this.submitLinkRef.current.click();
 
             }

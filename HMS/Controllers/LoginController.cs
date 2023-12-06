@@ -4,7 +4,10 @@ using HMS.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson.IO;
 using MySqlConnector;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace KEA_Final1.Controllers
 {
@@ -18,29 +21,40 @@ namespace KEA_Final1.Controllers
         {
             jwtTokenGenerator = new JwtTokenGenerator(configuration);
         }
+
         [AllowAnonymous]
         [HttpPost]
         public string LogIn([FromBody]Account user) 
         {
             if (user.CheckUserCredentials(user) == false) return null; // Suspicious credentials provided.
 
-            Database.MySQLContext mysql = new Database.MySQLContext();
+            BrowserStorage bs = null;
 
-            mysql.Db.Open();
-
-            using var command = new MySqlCommand($"SELECT * FROM accounts where username = {user.Username} and password = {user.Password};", mysql.Db);
-            using var reader = command.ExecuteReader();
-            bool userExists = reader.HasRows;
-            
-            mysql.Db.Close();
-
-            if (userExists)
+            using (MySqlCommand cmd = new MySqlCommand()) 
             {
-                return jwtTokenGenerator.GenerateToken(user.Username, "User");
+                Database.MySQLContext mysql = new Database.MySQLContext();
+                mysql.Db.Open();
+
+                cmd.CommandText = $"SELECT * FROM accounts a JOIN persondata p on p.cpr = a.username WHERE username = {user.Username} and password = {user.Password};";
+                cmd.Connection = mysql.Db;
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    bs = new BrowserStorage()
+                    {
+                        UserId = reader.GetInt32("id"),
+                        Role = reader.GetString("role"),
+                        Token = jwtTokenGenerator.GenerateToken(user.Username, reader.GetString("role"))
+                    };
+                }
+
+                mysql.Db.Close();
             }
+
+            if (bs != null)
+                return JsonSerializer.Serialize(bs);
             
-
-
             return string.Empty;
         }
 
