@@ -14,6 +14,16 @@ export class Prescriptions extends Component {
         };
     }
 
+    componentDidMount()
+    {
+        // Check if user is logged in.
+        var token = localStorage.getItem("token");
+        if (token === "") {
+            window.location.href = '/';
+            return;
+        }
+    }
+
     handleSearchInputChange = (e) => {
         this.setState({
             searchText: e.target.value,

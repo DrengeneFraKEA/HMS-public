@@ -9,6 +9,13 @@ export class Login extends Component {
     static displayName = Login.name;
     submitLinkRef = React.createRef();
 
+    componentDidMount()
+    {
+        // Reset everything in case cache exists.
+        localStorage.setItem('token', "");
+        localStorage.setItem('userid', "");
+        localStorage.setItem('role', "");
+    }
 
     handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,10 +37,7 @@ export class Login extends Component {
                 this.setState({ token });
 
                 localStorage.setItem('userid', response.data["UserId"]);
-                this.setState({ token });
-
                 localStorage.setItem('role', response.data["Role"]);
-                this.setState({ token });
 
                 this.submitLinkRef.current.click();
 
@@ -41,7 +45,6 @@ export class Login extends Component {
             else {
 
                 alert("Ugyldigt CPR-nummer eller kodeord.");
-
             }
         } catch (error) {
             console.log(error);

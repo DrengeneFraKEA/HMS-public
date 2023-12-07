@@ -6,7 +6,6 @@ import '../styling/navbar.css';
 
 export class Appointments extends Component {
     static displayName = Appointments.name;
-
     constructor(props) {
         super(props);
         this.state = {
@@ -15,6 +14,14 @@ export class Appointments extends Component {
     }
 
     componentDidMount() {
+        // Check if user is logged in.
+        var token = localStorage.getItem("token");
+        if (token === "")
+        {
+            window.location.href = '/';
+            return;
+        }
+
         // Fetch appointments data
         try {
             var request = "appointment/patient/" + localStorage.getItem('userid');

@@ -16,6 +16,16 @@ export default class Navbar extends Component
         };
     }
 
+    componentDidMount()
+    {
+        try {
+            axios.post("database", { value: localStorage.getItem('selectedOption') });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
     handleDropdownChange = (e) => {
         const selectedOption = e.target.value;
 
@@ -43,7 +53,6 @@ export default class Navbar extends Component
                     <Link to="/appointments" className="navbar-link">Henvisninger</Link>
                     <Link to="/prescriptions" className="navbar-link">Recept</Link>
                     <Link to="/journal" className="navbar-link">Journaler</Link>
-                    <Link to="/personalinfo" className="navbar-link">Personlig Information</Link>
                     <Link to="/rating" className="navbar-link">Rating</Link>
                 </div>
 
@@ -54,7 +63,6 @@ export default class Navbar extends Component
                         <option value="2">GraphQL</option>
                     </select>
                 </div>
-
             </nav>
         );
     }
