@@ -1,8 +1,10 @@
 using HMS.Data;
 using HMS.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MySqlConnector;
+using System.Configuration;
 using System.Runtime.CompilerServices;
 using System.Text;
 

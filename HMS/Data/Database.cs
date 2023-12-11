@@ -1,7 +1,6 @@
 ﻿using MongoDB.Driver;
-using MongoDB.Bson;
 using MySqlConnector;
-using System.Runtime.CompilerServices;
+using Neo4j.Driver;
 
 namespace HMS.Data
 {
@@ -32,9 +31,19 @@ namespace HMS.Data
 
         public class GraphQlContext 
         {
+            public IDriver Neo4jDriver { get; set; }
             public GraphQlContext() 
             {
-                // Do something..
+                var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                var neo4jUri = new Uri("neo4j+s://07a963f9.databases.neo4j.io");
+
+                this.Neo4jDriver = GraphDatabase.Driver(neo4jUri, AuthTokens.Basic("neo4j", "QlofL24P9k4fIbxjfnj7rwr5dvtZP4eahW7zem7vu-s"));
+                
+            }
+
+            public void Dispose()
+            {
+                Neo4jDriver?.Dispose();
             }
         }
     }

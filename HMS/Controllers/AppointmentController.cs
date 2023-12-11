@@ -12,6 +12,7 @@ using HMS.Utils;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using HMS.Services;
+using Neo4j.Driver;
 
 namespace HMS.Controllers;
 
@@ -108,13 +109,34 @@ public class AppointmentController : ControllerBase
 
                 var result = mc.GetDatabase("HMS").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
 
-                return result.ToString();
+                return result.ToString(); 
             case 2:
 
                 // Hent med graphql
+                Database.GraphQlContext gdbc = new Database.GraphQlContext();
+                var session = gdbc.Neo4jDriver.Session();
+                var getAllPatients = session.ExecuteWrite(tx =>
+                {
+                    var res = tx.Run("match (p:Patient) return p");
+
+                    var patients = res.Select(record =>
+                    {
+                        var node = record["p"].As<INode>();
+                        var props = node.Properties;
+                        return props.ToDictionary(p => p.Key, p => p.Value.ToString());
+                    }).ToList();
+
+                    return patients;
+                });
+
+                return JsonSerializer.Serialize(getAllPatients);
+
                 break;
         }
 
         return string.Empty;
     }
+
+
+   
 }
