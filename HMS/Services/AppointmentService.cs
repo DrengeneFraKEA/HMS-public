@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MySqlConnector;
+using Neo4j.Driver;
 using System.Data;
 using System.Text.Json;
 
@@ -135,7 +136,32 @@ namespace HMS.Services
                 case 2:
 
                     // Hent med graphql
+                    Database.GraphQlContext gdbc = new Database.GraphQlContext();
+                    var session = gdbc.Neo4jDriver.Session();
+                    var allAppointments = session.ExecuteRead(tx =>
+                    {
+                        var res = tx.Run("match (p:Patient {patient_id: " + patientId + "})-[:SCHEDULED_FOR] ->(a) return a");
+
+                        var appointments = res.Select(record =>
+                        {
+                            var node = record["a"].As<INode>();
+                            var props = node.Properties;
+
+                            return new DTO.Appointment
+                            {
+                                Id = int.Parse(props["appointment_id"].ToString()),
+                                Place = props["place"].ToString(),
+                                Start = DateTime.Parse(props["appointment_date"].ToString()),
+                                End = DateTime.Parse(props["appointment_date_end"].ToString())
+                            };
+                            
+                        }).ToList();
+
+                        return appointments;
+                    });
+                    return JsonSerializer.Serialize(allAppointments);
                     break;
+
             }
 
             return string.Empty;
