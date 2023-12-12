@@ -64,10 +64,10 @@ namespace KEA_Final1.Controllers
         public bool? Register([FromBody] Account user) 
         {
             if (user.CheckUserCredentials(user) == false) return null; // Suspicious credentials provided.
-
-            using(MySqlCommand cmd = new MySqlCommand()) 
+            Database.MySQLContext mysql = new Database.MySQLContext();
+            using (MySqlCommand cmd = new MySqlCommand()) 
             {
-                Database.MySQLContext mysql = new Database.MySQLContext();
+                //Database.MySQLContext mysql = new Database.MySQLContext();
                 cmd.CommandText = $"SELECT * FROM accounts where username = {user.Username}";
                 cmd.Connection = mysql.Db;
 
@@ -97,12 +97,20 @@ namespace KEA_Final1.Controllers
                 }
                 else
                 {
-                    // Add into persondata (because we don't actually have all cprs in denmark).
-                    cmd.CommandText = $"INSERT INTO persondata (cpr) VALUES ({user.Username})";
-                    using (var reader = cmd.ExecuteReader()) { };
-                    
-                    cmd.CommandText = $"INSERT INTO accounts (username, password) VALUES ({user.Username}, {user.Password})";
-                    cmd.ExecuteReader();
+                    using (var transaction = mysql.Db.BeginTransaction())
+                    {
+                        cmd.Transaction = transaction;
+
+                        // Add into persondata (because we don't actually have all cprs in denmark).
+                        cmd.CommandText = $"INSERT INTO persondata (cpr) VALUES ({user.Username})";
+                        //using (var reader = cmd.ExecuteReader()) { };
+                        cmd.ExecuteNonQuery();
+                        cmd.CommandText = $"INSERT INTO accounts (username, password) VALUES ({user.Username}, {user.Password})";
+                        //cmd.ExecuteReader();
+                        cmd.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
                 }
                 
                 mysql.Db.Close();
