@@ -205,6 +205,27 @@ namespace HMS.Services
                 case 2:
 
                     // Hent med graphql
+                    Database.GraphQlContext gdbc = new Database.GraphQlContext();
+                    var session = gdbc.Neo4jDriver.Session();
+                   
+                    var createAppointment = session.ExecuteWrite(tx =>
+                    {
+                        var res = tx.Run($@"CREATE (a:Appointment {{ 
+                            appointment_id: {int.Parse(appointment.AppointmentId.ToString())}, 
+                            appointment_date: '{DateTime.Parse(appointment.AppointmentDate.ToString())}', 
+                            appointment_date_end: '{DateTime.Parse(appointment.AppointmentDateEnd.ToString())}', 
+                            place: '{appointment.Hospital.Name}' 
+                                }}) 
+                            WITH a 
+                            MATCH (p:Patient {{patient_id: {appointment.Patient.PatientId}}}) 
+                            MATCH (d:Doctor {{doctor_id: {appointment.DoctorId}}}) 
+                            CREATE (p)-[:SCHEDULED_FOR]->(a)<-[:SCHEDULED_FOR]-(d)");
+
+
+                        return res;
+        
+                    });
+                    
                     break;
             }
         }
@@ -258,6 +279,21 @@ namespace HMS.Services
                 case 2:
 
                     // Hent med graphql
+                    Database.GraphQlContext gdbc = new Database.GraphQlContext();
+                    var session = gdbc.Neo4jDriver.Session();
+
+                    var updateAppointment = session.ExecuteWrite(tx =>
+                    {
+                        var res = tx.Run($@"MATCH (a:Appointment {{ 
+                        appointment_id: {int.Parse(appointment.AppointmentId.ToString())}
+                        }}) 
+                        SET a.appointment_date = '{DateTime.Parse(appointment.AppointmentDate.ToString())}', 
+                        a.appointment_date_end = '{DateTime.Parse(appointment.AppointmentDateEnd.ToString())}', 
+                        a.place = '{appointment.Hospital.Name}'");
+
+                        return res;
+                    });
+
                     break;
             }
            
@@ -295,6 +331,16 @@ namespace HMS.Services
                 case 2:
 
                     // Hent med graphql
+                    Database.GraphQlContext gdbc = new Database.GraphQlContext();
+                    var session = gdbc.Neo4jDriver.Session();
+
+                    var deleteAppointment = session.ExecuteWrite(tx =>
+                    {
+                        var res = tx.Run($@"MATCH (a:Appointment {{ appointment_id: {int.Parse(appointmentId.ToString())}}})
+                                        DETACH DELETE a ");
+
+                        return res;
+                    });
                     break;
             }
         }

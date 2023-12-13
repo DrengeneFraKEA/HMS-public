@@ -3,7 +3,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace HMS.Models;
-
+[BsonIgnoreExtraElements]
 public class Clinic
 {
     [BsonElement("id")]
