@@ -41,5 +41,34 @@ namespace HMS.Services
 
             return JsonSerializer.Serialize(person);
         }
+
+        public bool DoesPersonExistByCPR(string cpr)
+        {
+            bool legit = cpr.Length == 10 && int.TryParse(cpr, out _);
+            if (!legit) return false;
+
+            bool exists = false;
+
+            switch (Database.SelectedDatabase)
+            {
+                case 0:
+                    Database.MySQLContext mysql = new Database.MySQLContext();
+
+                    mysql.Db.Open();
+
+                    var command = new MySqlCommand($"SELECT * FROM personData WHERE cpr = {cpr};", mysql.Db);
+                    var reader = command.ExecuteReader();
+                    exists = reader.HasRows;
+
+                    mysql.Db.Close();
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+
+            return exists;
+        }
     }
 }

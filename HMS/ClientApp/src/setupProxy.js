@@ -9,7 +9,8 @@ const context = [
     "/drug",
     "/appointment",
     "/database",
-    "/person"
+    "/person",
+    "/journal"
 ];
 
 const onError = (err, req, resp, target) => {

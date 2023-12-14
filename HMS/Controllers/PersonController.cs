@@ -15,11 +15,17 @@ namespace HMS.Controllers
     {
         private readonly PersonService personService = new PersonService();
 
-        //[Authorize]
         [HttpPost("{id}")]
         public string GetPersonData(int id)
         {
             return personService.GetPersonData(id);
+        }
+
+        [Authorize]
+        [HttpGet("person/{cpr}")]
+        public bool DoesPersonExistByCPR(string cpr)
+        {
+            return personService.DoesPersonExistByCPR(cpr);
         }
     }
 }
