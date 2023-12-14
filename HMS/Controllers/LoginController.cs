@@ -99,17 +99,23 @@ namespace KEA_Final1.Controllers
                 {
                     using (var transaction = mysql.Db.BeginTransaction())
                     {
-                        cmd.Transaction = transaction;
+                        try
+                        {
+                            cmd.Transaction = transaction;
 
-                        // Add into persondata (because we don't actually have all cprs in denmark).
-                        cmd.CommandText = $"INSERT INTO persondata (cpr) VALUES ({user.Username})";
-                        //using (var reader = cmd.ExecuteReader()) { };
-                        cmd.ExecuteNonQuery();
-                        cmd.CommandText = $"INSERT INTO accounts (username, password) VALUES ({user.Username}, {user.Password})";
-                        //cmd.ExecuteReader();
-                        cmd.ExecuteNonQuery();
+                            // Add into persondata (because we don't actually have all cprs in denmark).
+                            cmd.CommandText = $"INSERT INTO persondata (first_name, last_name, contact_number, cpr, address) VALUES ('John','Smith',12345678,{user.Username}, 'Guldbergsgade 29N')";
+                            cmd.ExecuteNonQuery();
+                            cmd.CommandText = $"INSERT INTO accounts (username, password, role) VALUES ({user.Username}, {user.Password}, 'patient')";
+                            cmd.ExecuteNonQuery();
 
-                        transaction.Commit();
+                            transaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            Console.WriteLine(ex.Message);
+                        }
                     }
                 }
                 
