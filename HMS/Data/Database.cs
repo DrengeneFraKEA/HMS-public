@@ -7,13 +7,34 @@ namespace HMS.Data
     public static class Database 
     {
         public static int SelectedDatabase { get; set; } = 0;
+        public enum MySqlAccountType 
+        {
+            ReadOnly = 0,
+            WriteOnly = 1,
+            ReadWrite = 2,
+            FullAdmin = 3
+        }
 
         public class MySQLContext
         {
             public MySqlConnection Db { get; set; }
-            public MySQLContext() 
+            public MySQLContext(MySqlAccountType type) 
             {
-                this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                switch (type)
+                {
+                    case MySqlAccountType.ReadOnly:
+                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                        break;
+                    case MySqlAccountType.WriteOnly:
+                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                        break;
+                    case MySqlAccountType.ReadWrite:
+                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                        break;
+                    case MySqlAccountType.FullAdmin:
+                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                        break;
+                }
             }
         }
 

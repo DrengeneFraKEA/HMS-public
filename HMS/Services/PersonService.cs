@@ -13,7 +13,7 @@ namespace HMS.Services
             switch (Database.SelectedDatabase) 
             {
                 case 0:
-                    Database.MySQLContext mysql = new Database.MySQLContext();
+                    Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
                     mysql.Db.Open();
 
                     var command = new MySqlCommand($"SELECT * FROM persondata WHERE id = {id};", mysql.Db);
@@ -52,7 +52,7 @@ namespace HMS.Services
             switch (Database.SelectedDatabase)
             {
                 case 0:
-                    Database.MySQLContext mysql = new Database.MySQLContext();
+                    Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
 
                     mysql.Db.Open();
 

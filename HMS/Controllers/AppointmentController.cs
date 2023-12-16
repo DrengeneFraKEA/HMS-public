@@ -1,18 +1,7 @@
-using HMS.Data;
 using Microsoft.AspNetCore.Mvc;
-using HMS.Models;
-using MySqlConnector;
-using Microsoft.Extensions.Options;
-using System.Data;
-using HMS.DTO;
-using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
-using HMS.Utils;
-using MongoDB.Driver;
-using MongoDB.Bson;
 using HMS.Services;
-using Neo4j.Driver;
 
 namespace HMS.Controllers;
 
@@ -28,14 +17,10 @@ public class AppointmentController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet]
-    public string GetAppointments()
+    [HttpGet("{id}")]
+    public string GetAppointmentbyId(string id)
     {
-
-        var appointments = appointmentService.GetAppointments();
-
-        return appointments;
-       
+        return JsonSerializer.Serialize(appointmentService.GetAppointmentById(id));
     }
 
     [Authorize]
@@ -49,7 +34,7 @@ public class AppointmentController : ControllerBase
     [HttpPost]
     public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
     {
-        try 
+        try
         {
             appointmentService.CreateAppointment(appointment);
             return Ok("Appointment created successfully");
@@ -60,12 +45,18 @@ public class AppointmentController : ControllerBase
         }
     }
 
-
-    [HttpPut]
-    public IActionResult UpdateAppointment([FromBody]Models.Appointment appointment)
+    [Authorize]
+    [HttpGet("{id}/start/{start}/end/{end}")]
+    public IActionResult UpdateAppointment(string id, string start, string end)
     {
         try
         {
+            Models.Appointment appointment = appointmentService.GetAppointmentById(id);
+            if (appointment == null) return BadRequest("Appointment with id doesn't exist.");
+
+            appointment.AppointmentDate = DateTime.Parse(start);
+            appointment.AppointmentDateEnd = DateTime.Parse(end);
+
             appointmentService.UpdateAppointment(appointment);
             return Ok("Appointment updated successfully");
         }
@@ -76,67 +67,17 @@ public class AppointmentController : ControllerBase
     }
 
 
-    [HttpDelete("delete/{appointmentId}")]
-    public IActionResult DeleteAppointment(int appointmentId)
+    [HttpDelete("{id}")]
+    public IActionResult DeleteAppointment(string id)
     {
         try
         {
-            appointmentService.DeleteAppointment(appointmentId);
-            return Ok("Appointment deleted successfully");
+            appointmentService.DeleteAppointment(int.Parse(id));
+            return Ok($"Appointment with id {id} deleted");
         }
         catch (Exception ex)
         {
             return BadRequest("Failed to delete appointment " + ex.Message);
         }
     }
-
-    [HttpGet("Test")]
-    public string Test() 
-    {
-        switch (Database.SelectedDatabase) 
-        {
-            case 0:
-                // Hent med mysql..
-
-                Database.MySQLContext mysql = new Database.MySQLContext();
-
-                break;
-            case 1:
-                // Hent med mongo db..
-
-                Database.MongoDbContext mdbc = new Database.MongoDbContext();
-                MongoClient mc = new MongoClient(mdbc.ConnectionString);
-
-                var result = mc.GetDatabase("HMS").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
-
-                return result.ToString(); 
-            case 2:
-
-                // Hent med graphql
-                Database.GraphQlContext gdbc = new Database.GraphQlContext();
-                var session = gdbc.Neo4jDriver.Session();
-                var getAllPatients = session.ExecuteWrite(tx =>
-                {
-                    var res = tx.Run("match (p:Patient) return p");
-
-                    var patients = res.Select(record =>
-                    {
-                        var node = record["p"].As<INode>();
-                        var props = node.Properties;
-                        return props.ToDictionary(p => p.Key, p => p.Value.ToString());
-                    }).ToList();
-
-                    return patients;
-                });
-
-                return JsonSerializer.Serialize(getAllPatients);
-
-                break;
-        }
-
-        return string.Empty;
-    }
-
-
-   
 }

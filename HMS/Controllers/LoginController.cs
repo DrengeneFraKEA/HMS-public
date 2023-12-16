@@ -32,7 +32,7 @@ namespace KEA_Final1.Controllers
 
             using (MySqlCommand cmd = new MySqlCommand()) 
             {
-                Database.MySQLContext mysql = new Database.MySQLContext();
+                Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
                 mysql.Db.Open();
 
                 cmd.CommandText = $"SELECT * FROM accounts a JOIN persondata p on p.cpr = a.username WHERE username = {user.Username} and password = {user.Password};";
@@ -64,7 +64,7 @@ namespace KEA_Final1.Controllers
         public bool? Register([FromBody] Account user) 
         {
             if (user.CheckUserCredentials(user) == false) return null; // Suspicious credentials provided.
-            Database.MySQLContext mysql = new Database.MySQLContext();
+            Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadWrite);
             using (MySqlCommand cmd = new MySqlCommand()) 
             {
                 //Database.MySQLContext mysql = new Database.MySQLContext();

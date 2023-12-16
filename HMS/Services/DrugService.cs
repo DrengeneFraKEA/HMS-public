@@ -23,7 +23,7 @@ public class DrugService
                 // Hent med mysql..
 
                 var drugs = new List<Drug>();
-                Database.MySQLContext mysql = new Database.MySQLContext();
+                Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
 
                 mysql.Db.Open();
 
@@ -105,7 +105,7 @@ public class DrugService
     public string GetDrugsWithPrescriptions()
     {
         var drug_prescriptions = new List<Drug_Prescription>();
-        Database.MySQLContext mysql = new Database.MySQLContext();
+        Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
         mysql.Db.Open();
 
         using var command = new MySqlCommand("SELECT * FROM drug_prescription;", mysql.Db);

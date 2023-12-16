@@ -7,8 +7,6 @@ namespace HMS.Models;
 [BsonIgnoreExtraElements]
 public class Appointment
 {
-
-
     [BsonElement("_id")]
     public ObjectId Id { get; set; } = ObjectId.GenerateNewId();
 
@@ -34,8 +32,4 @@ public class Appointment
 
     [BsonElement("hospital")]
     public Hospital Hospital { get; set; }
-
-
-
-
 }

@@ -15,7 +15,7 @@ namespace HMS.Services
             switch (Database.SelectedDatabase) 
             {
                 case 0:
-                    Database.MySQLContext mysql = new Database.MySQLContext();
+                    Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
 
                     mysql.Db.Open();
 
@@ -53,7 +53,7 @@ namespace HMS.Services
             // MySQL
             DateTime dt = DateTime.Now;
             string now = dt.ToString("yyyy-MM-dd HH:mm:ss");
-            Database.MySQLContext mysql = new Database.MySQLContext();
+            Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadWrite);
 
             mysql.Db.Open();
 
@@ -73,7 +73,7 @@ namespace HMS.Services
         public bool DeleteJournal(string journalid) 
         {
             // MySQL
-            Database.MySQLContext mysql = new Database.MySQLContext();
+            Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.FullAdmin);
 
             mysql.Db.Open();
 
@@ -97,7 +97,7 @@ namespace HMS.Services
             DateTime dt = DateTime.Now;
             string now = dt.ToString("yyyy-MM-dd HH:mm:ss");
 
-            Database.MySQLContext mysql = new Database.MySQLContext();
+            Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadWrite);
 
             mysql.Db.Open();
 
