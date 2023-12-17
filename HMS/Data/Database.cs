@@ -23,13 +23,13 @@ namespace HMS.Data
                 switch (type)
                 {
                     case MySqlAccountType.ReadOnly:
-                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hmsread; Password=hms1234!; Database=HMS");
                         break;
                     case MySqlAccountType.WriteOnly:
-                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hmswrite; Password=hms1234!; Database=HMS");
                         break;
                     case MySqlAccountType.ReadWrite:
-                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hmsreadwrite; Password=hms1234!; Database=HMS");
                         break;
                     case MySqlAccountType.FullAdmin:
                         this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
