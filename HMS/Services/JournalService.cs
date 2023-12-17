@@ -1,6 +1,8 @@
 ﻿using HMS.Data;
+using HMS.DTO;
 using HMS.Models;
 using MySqlConnector;
+using Neo4j.Driver;
 using System.Runtime.ConstrainedExecution;
 using System.Text.Json;
 
@@ -62,11 +64,34 @@ namespace HMS.Services
 
             command.ExecuteReader();
 
+            var lastID = command.LastInsertedId;
+
+            mysql.Db.Close();
+
             // MongoDB
 
 
             // GraphQL
+            Database.GraphQlContext gdbc = new Database.GraphQlContext();
+            var session = gdbc.Neo4jDriver.Session();
+            
+            var createJournal = session.ExecuteWrite(tx =>
+            {
+                var res = tx.Run($@"CREATE (j:Journal {{ 
+                    journal_id: {lastID}, 
+                    doctor_id: '{doctorid}', 
+                    journalnotes: '{journaltext}', 
+                    created_on: '{now}',
+                    modified_on: '{now}',
+                    cpr: '{cpr}'
+                        }}) 
+                    WITH j 
+                    MATCH (p:Patient {{cpr: {cpr}}}) 
+                    MATCH (d:Doctor {{doctor_id: {doctorid}}}) 
+                    CREATE (p)-[:ON_BEHALF_OF]->(j)<-[:WRITES]-(d)");
 
+                return res;
+            });
             return true;
         }
 
@@ -87,7 +112,16 @@ namespace HMS.Services
 
 
             // GraphQL
+            Database.GraphQlContext gdbc = new Database.GraphQlContext();
+            var session = gdbc.Neo4jDriver.Session();
 
+            var deleteAppointment = session.ExecuteWrite(tx =>
+            {
+                var res = tx.Run($@"MATCH (j:Journal {{ journal_id: {journalid}}})
+                                DETACH DELETE j ");
+
+                return res;
+            });
             return true;
         }
 
@@ -112,7 +146,20 @@ namespace HMS.Services
 
 
             // GraphQL
+            Database.GraphQlContext gdbc = new Database.GraphQlContext();
+            var session = gdbc.Neo4jDriver.Session();
 
+            var updateJournal = session.ExecuteWrite(tx =>
+            {
+                var res = tx.Run($@"MATCH (j:Journal 
+                {{ 
+                journal_id: {journalid}
+                }}) 
+                SET j.journalnotes = '{newjournaltext}', 
+                j.modified_on = '{now}'");
+
+                return res;
+            });
             return true;
         }
     }
