@@ -56,9 +56,14 @@ namespace HMS.Data
             public GraphQlContext() 
             {
                 var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-                var neo4jUri = new Uri("neo4j+s://07a963f9.databases.neo4j.io");
+                var neo4jConnection = config.GetSection("Neo4jSettings:Neo4jConnection").Value;
+                var neo4jUser = config.GetSection("Neo4jSettings:Neo4jUser").Value;
+                var neo4jPassword = config.GetSection("Neo4jSettings:Neo4jPassword").Value;
 
-                this.Neo4jDriver = GraphDatabase.Driver(neo4jUri, AuthTokens.Basic("neo4j", "QlofL24P9k4fIbxjfnj7rwr5dvtZP4eahW7zem7vu-s"));
+
+                var neo4jUri = new Uri(neo4jConnection);
+
+                this.Neo4jDriver = GraphDatabase.Driver(neo4jUri, AuthTokens.Basic(neo4jUser, neo4jPassword));
                 
             }
 
