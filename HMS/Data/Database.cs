@@ -20,19 +20,21 @@ namespace HMS.Data
             public MySqlConnection Db { get; set; }
             public MySQLContext(MySqlAccountType type) 
             {
+                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                
                 switch (type)
                 {
                     case MySqlAccountType.ReadOnly:
-                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hmsread; Password=hms1234!; Database=HMS");
+                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlRead").Value);
                         break;
                     case MySqlAccountType.WriteOnly:
-                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hmswrite; Password=hms1234!; Database=HMS");
+                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlWrite").Value);
                         break;
                     case MySqlAccountType.ReadWrite:
-                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hmsreadwrite; Password=hms1234!; Database=HMS");
+                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlReadWrite").Value);
                         break;
                     case MySqlAccountType.FullAdmin:
-                        this.Db = new MySqlConnection("Server=hospitalmanagementsystem1.mysql.database.azure.com; User ID=hospitalmanagementsystem; Password=hms1234!; Database=HMS");
+                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlAdmin").Value);
                         break;
                 }
             }
@@ -44,7 +46,9 @@ namespace HMS.Data
             public MongoClientSettings Settings { get; set; }
             public MongoDbContext() 
             {
-                this.ConnectionString = "mongodb+srv://hms_admin:vGaQGWA85GqRofPf@hms.eigi1od.mongodb.net/?retryWrites=true&w=majority";
+                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
+                this.ConnectionString = config.GetSection("MongoDB:Connection").Value;
                 this.Settings = MongoClientSettings.FromConnectionString(ConnectionString);
                 this.Settings.ServerApi = new ServerApi(ServerApiVersion.V1);
             }
