@@ -1,0 +1,22 @@
+﻿.user-info-box {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px;
+}
+
+.user-info-box h2 {
+    color: #333;
+}
+
+.info-item {
+    margin-bottom: 15px;
+}
+
+.info-item strong {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #555;
+}
