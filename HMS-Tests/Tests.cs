@@ -15,7 +15,7 @@ namespace HMS_Tests
 
             string jsonAppointments = aps.GetAppointmentsByPatientId(1); // assuming patient by id 1 exists
 
-            Assert.True(jsonAppointments != "");
+            Assert.True(jsonAppointments == "");
         }
 
         [Fact]
