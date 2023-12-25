@@ -20,7 +20,7 @@ namespace HMS.Data
             public MySqlConnection Db { get; set; }
             public MySQLContext(MySqlAccountType type) 
             {
-                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
                 
                 switch (type)
                 {
@@ -46,7 +46,7 @@ namespace HMS.Data
             public MongoClientSettings Settings { get; set; }
             public MongoDbContext() 
             {
-                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
 
                 this.ConnectionString = config.GetSection("MongoDB:Connection").Value;
                 this.Settings = MongoClientSettings.FromConnectionString(ConnectionString);
@@ -59,7 +59,7 @@ namespace HMS.Data
             public IDriver Neo4jDriver { get; set; }
             public GraphQlContext() 
             {
-                var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
                 var neo4jConnection = config.GetSection("Neo4jSettings:Neo4jConnection").Value;
                 var neo4jUser = config.GetSection("Neo4jSettings:Neo4jUser").Value;
                 var neo4jPassword = config.GetSection("Neo4jSettings:Neo4jPassword").Value;
