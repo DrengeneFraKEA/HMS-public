@@ -27,13 +27,22 @@ jobs:
       - uses: actions/checkout@v2
         with:
            fetch-depth: 0
-      - name: Secrets
+      - name: Create temporary appsettings.json
         run: |
-            echo "JWT_KEY: ${{ secrets.JWT_ISSUER }}"
-            echo "NEO4J_CONN: ${{ secrets.NEO4J_CONN }}"
-        shell: bash
+          echo "$(cat appsettings.json)" > appsettings.temp.json
+          sed -i "s|${{ secrets.JWT_ISSUER }}|${{ env.JWT_ISSUER }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.JWT_AUDIENCE }}|${{ env.JWT_AUDIENCE }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.JWT_KEY }}|${{ env.JWT_KEY }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.MYSQL_READ }}|${{ env.MYSQL_READ }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.MYSQL_WRITE }}|${{ env.MYSQL_WRITE }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.MYSQL_READWRITE }}|${{ env.MYSQL_READWRITE }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.MYSQL_ADMIN }}|${{ env.MYSQL_ADMIN }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.MONGODB_CONN }}|${{ env.MONGODB_CONN }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.NEO4J_CONN }}|${{ env.NEO4J_CONN }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.NEO4J_USER }}|${{ env.NEO4J_USER }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.NEO4J_PASSWORD }}|${{ env.NEO4J_PASSWORD }}|" appsettings.temp.json
+          sed -i "s|${{ secrets.NEO4J_DATABASE }}|${{ env.NEO4J_DATABASE }}|" appsettings.temp.json
 
-      #- name: Build and Test
-       # run: |
-        #  dotnet build
-         # dotnet test
+
+      - name: Test
+        run: dotnet test
