@@ -43,7 +43,7 @@ namespace HMS_Tests
         [Fact]
         public void GithubSecretTest()
         {
-            string secret = "${{ secrets.MYSECRET }}";
+            string secret = Environment.GetEnvironmentVariable("MYSECRET");
 
             Assert.True(secret == "secret exposed");
         }
