@@ -26,6 +26,7 @@ namespace HMS.Data
                 {
                     case MySqlAccountType.ReadOnly:
                         this.Db = new MySqlConnection(config.GetSection("MySql:MySqlRead").Value);
+                        Console.WriteLine($"Connection string: {this.Db}");
                         break;
                     case MySqlAccountType.WriteOnly:
                         this.Db = new MySqlConnection(config.GetSection("MySql:MySqlWrite").Value);
