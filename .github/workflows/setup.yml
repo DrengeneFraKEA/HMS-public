@@ -10,18 +10,18 @@ jobs:
     runs-on: windows-latest
 
     env:
-      JWT_ISSUER: ${{ JWT_ISSUER }}
-      JWT_AUDIENCE: ${{ JWT_AUDIENCE }}
-      JWT_KEY: ${{ JWT_KEY }}
-      MYSQL_READ: ${{ MYSQL_READ }}
-      MYSQL_WRITE: ${{ MYSQL_WRITE }}
-      MYSQL_READWRITE: ${{ MYSQL_READWRITE }}
-      MYSQL_ADMIN: ${{ MYSQL_ADMIN }}
-      MONGODB_CONN: ${{ MONGODB_CONN }}
-      NEO4J_CONN: ${{ NEO4J_CONN }}
-      NEO4J_USER: ${{ NEO4J_USER }}
-      NEO4J_PASSWORD: ${{ NEO4J_PASSWORD }}
-      NEO4J_DATABASE: ${{ NEO4J_DATABASE }}
+      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+      JWT_KEY: ${{ secrets.JWT_KEY }}
+      MYSQL_READ: ${{ secrets.MYSQL_READ }}
+      MYSQL_WRITE: ${{ secrets.MYSQL_WRITE }}
+      MYSQL_READWRITE: ${{ secrets.MYSQL_READWRITE }}
+      MYSQL_ADMIN: ${{ secrets.MYSQL_ADMIN }}
+      MONGODB_CONN: ${{ secrets.MONGODB_CONN }}
+      NEO4J_CONN: ${{ secrets.NEO4J_CONN }}
+      NEO4J_USER: ${{ secrets.NEO4J_USER }}
+      NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+      NEO4J_DATABASE: ${{ secrets.NEO4J_DATABASE }}
 
     steps:
       - uses: actions/checkout@v2
