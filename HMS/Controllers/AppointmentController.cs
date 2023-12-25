@@ -36,7 +36,7 @@ public class AppointmentController : ControllerBase
     {
         try
         {
-            appointmentService.CreateAppointment(appointment);
+            appointmentService.CreateAppointment(appointment, out _);
             return Ok("Appointment created successfully");
         }
         catch (Exception ex) 
@@ -52,13 +52,12 @@ public class AppointmentController : ControllerBase
         try
         {
             Models.Appointment appointment = appointmentService.GetAppointmentById(id);
-            if (appointment == null) return BadRequest("Appointment with id doesn't exist.");
 
             appointment.AppointmentDate = DateTime.Parse(start);
             appointment.AppointmentDateEnd = DateTime.Parse(end);
 
             appointmentService.UpdateAppointment(appointment);
-            return Ok("Appointment updated successfully");
+            return Ok("Appointment updated");
         }
         catch (Exception ex)
         {

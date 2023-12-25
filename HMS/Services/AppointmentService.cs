@@ -1,4 +1,5 @@
 ﻿using HMS.Data;
+using HMS.Models;
 using MongoDB.Driver;
 using MySqlConnector;
 using Neo4j.Driver;
@@ -123,8 +124,14 @@ namespace HMS.Services
             return JsonSerializer.Serialize(appointments);
         }
 
-        public void CreateAppointment(Models.Appointment appointment)
+        public bool CreateAppointment(Models.Appointment appointment, out int? id)
         {
+            if (appointment == null) 
+            {
+                id = null;
+                return false;
+            }
+
             // MySql
             Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadWrite);
 
@@ -132,7 +139,6 @@ namespace HMS.Services
             var command = new MySqlCommand("CreateAppointment", mysql.Db);
             command.CommandType = CommandType.StoredProcedure;
 
-            command.Parameters.AddWithValue("a_appointment_id", appointment.AppointmentId);
             command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
             command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
             command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
@@ -140,7 +146,16 @@ namespace HMS.Services
             command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
             command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
 
-            command.ExecuteNonQuery();
+            var lastIdParameter = new MySqlParameter("last_id", MySqlDbType.Int32);
+            lastIdParameter.Direction = ParameterDirection.Output;
+            command.Parameters.Add(lastIdParameter);
+
+            command.ExecuteReader();
+
+            id = Convert.ToInt32(command.Parameters["last_id"].Value);
+
+            appointment.AppointmentId = id.Value;
+            
             mysql.Db.Close();
 
             // MongoDB
@@ -157,10 +172,10 @@ namespace HMS.Services
             Database.GraphQlContext gdbc = new Database.GraphQlContext();
             var session = gdbc.Neo4jDriver.Session();
             string place = appointment.Clinic?.Name != null ? appointment.Clinic.Name : appointment.Hospital.Name;
-            var createAppointment = session.ExecuteWrite(tx => 
+            var createAppointment = session.ExecuteWrite(tx =>
             {
                 var res = tx.Run($@"CREATE (a:Appointment {{ 
-                    appointment_id: {int.Parse(appointment.AppointmentId.ToString())}, 
+                    appointment_id: {appointment.AppointmentId}, 
                     appointment_date: '{DateTime.Parse(appointment.AppointmentDate.ToString())}', 
                     appointment_date_end: '{DateTime.Parse(appointment.AppointmentDateEnd.ToString())}', 
                     place: '{place}'
@@ -172,10 +187,14 @@ namespace HMS.Services
 
                 return res;
             });
+
+            return true;
         }
 
-        public void UpdateAppointment(Models.Appointment appointment)
+        public bool UpdateAppointment(Models.Appointment appointment)
         {
+            if (appointment == null) return false;
+
             // MySql
             Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadWrite);
 
@@ -228,9 +247,11 @@ namespace HMS.Services
 
                 return res;
             });
+
+            return true;
         }
 
-        public void DeleteAppointment(int appointmentId)
+        public bool DeleteAppointment(int appointmentId)
         {
             // Hent med mysql..
             Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.FullAdmin);
@@ -264,6 +285,34 @@ namespace HMS.Services
 
                 return res;
             });
+
+            return true;
+        }
+
+        public int? GetRandomAppointmentId() 
+        {
+            List<int> ids = new List<int>();
+            
+            // Hent med mysql.
+            Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
+
+            mysql.Db.Open();
+            var command = new MySqlCommand("SELECT id FROM appointment", mysql.Db);
+            var reader = command.ExecuteReader();
+            
+            while (reader.Read())
+            {
+                ids.Add(reader.GetInt32("id"));
+            }
+
+            mysql.Db.Close();
+
+            if (!ids.Any()) return null;
+
+            Random r = new Random();
+            int index = r.Next(0, ids.Count);
+
+            return ids.ElementAt(index);
         }
     }
 }
