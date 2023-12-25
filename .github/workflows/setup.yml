@@ -15,7 +15,7 @@ jobs:
       
       - name: Test environment variable
         run: |
-          echo "MYSECRET=secret exposed" >> $GITHUB_ENV
+          echo "MYSECRET="${{ secrets.MYSECRET }}"" >> $GITHUB_ENV
 
           
       - name: Test
