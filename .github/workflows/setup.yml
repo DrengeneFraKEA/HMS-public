@@ -27,5 +27,9 @@ jobs:
           echo "NEO4J_PASSWORD=${{ secrets.NEO4J_PASSWORD }}" >> $GITHUB_ENV
           echo "NEO4J_DATABASE=${{ secrets.NEO4J_DATABASE }}" >> $GITHUB_ENV
 
+      - name: view the secrets context
+        shell: bash
+        run: echo "${{ env.NEO4J_USER }}"
+          
       - name: Test
         run: dotnet test
