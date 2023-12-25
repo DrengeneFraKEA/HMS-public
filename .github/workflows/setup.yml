@@ -27,16 +27,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
            fetch-depth: 0
-      - name: Debug Environment Variables
+      - name: Secrets
         run: |
-            echo "JWT_KEY: $JWT_KEY"
-            echo "MYSQL_READ: $MYSQL_READ"
-            echo "NEO4J_CONN: $NEO4J_CONN"
-        shell: pwsh
-        env:
-            JWT_KEY: ${{ secrets.JWT_KEY }}
-            MYSQL_READ: ${{ secrets.MYSQL_READ }}
-            NEO4J_CONN: ${{ secrets.NEO4J_CONN }}
+            echo "JWT_KEY: ${{ secrets.JWT_ISSUER }}"
+            echo "NEO4J_CONN: ${{ secrets.NEO4J_CONN }}"
+        shell: bash
 
       #- name: Build and Test
        # run: |
