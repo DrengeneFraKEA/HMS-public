@@ -1,0 +1,34 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - ci_pipeline
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+      JWT_KEY: ${{ secrets.JWT_KEY }}
+      MYSQL_READ: ${{ secrets.MYSQL_READ }}
+      MYSQL_WRITE: ${{ secrets.MYSQL_WRITE }}
+      MYSQL_READWRITE: ${{ secrets.MYSQL_READWRITE }}
+      MYSQL_ADMIN: ${{ secrets.MYSQL_ADMIN }}
+      MONGODB_CONN: ${{ secrets.MONGODB_CONN }}
+      NEO4J_CONN: ${{ secrets.NEO4J_CONN }}
+      NEO4J_USER: ${{ secrets.NEO4J_USER }}
+      NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+      NEO4J_DATABASE: ${{ secrets.NEO4J_DATABASE }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+           fetch-depth: 0
+
+      - name: Build and Test
+        run: |
+          dotnet build
+          dotnet test
