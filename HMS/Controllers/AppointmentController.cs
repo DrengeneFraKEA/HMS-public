@@ -27,7 +27,7 @@ public class AppointmentController : ControllerBase
     [HttpGet("patient/{patientId}")]
     public string GetAppointmentsByPatientId(int patientId)
     {
-        return appointmentService.GetAppointmentsByPatientId(patientId);
+        return JsonSerializer.Serialize(appointmentService.GetAppointmentsByPatientId(patientId));
     }
 
 

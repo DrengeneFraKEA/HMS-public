@@ -41,7 +41,7 @@ namespace HMS.Services
             return appointment;
         }
 
-        public string GetAppointmentsByPatientId(int patientId)
+        public List<DTO.Appointment> GetAppointmentsByPatientId(int patientId)
         {
             List<DTO.Appointment> appointments = new List<DTO.Appointment>();
 
@@ -121,7 +121,7 @@ namespace HMS.Services
                 break;
             }
 
-            return JsonSerializer.Serialize(appointments);
+            return appointments;
         }
 
         public bool CreateAppointment(Models.Appointment appointment, out int? id)

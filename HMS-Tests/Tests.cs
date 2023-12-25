@@ -15,9 +15,9 @@ namespace HMS_Tests
             Database.SelectedDatabase = 0; // MySql
             AppointmentService aps = new AppointmentService();
 
-            int? randomAppointmentId = aps.GetRandomAppointmentId();
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
 
-            Assert.True(randomAppointmentId != null);
+            Assert.True(appointments.Any());
         }
 
         [Fact]
@@ -26,9 +26,9 @@ namespace HMS_Tests
             Database.SelectedDatabase = 1; // MongoDB
             AppointmentService aps = new AppointmentService();
 
-            int? randomAppointmentId = aps.GetRandomAppointmentId();
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
 
-            Assert.True(randomAppointmentId != null);
+            Assert.True(appointments.Any());
         }
 
         [Fact]
@@ -37,9 +37,9 @@ namespace HMS_Tests
             Database.SelectedDatabase = 2; // Neo4j
             AppointmentService aps = new AppointmentService();
 
-            int? randomAppointmentId = aps.GetRandomAppointmentId();
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
 
-            Assert.True(randomAppointmentId != null);
+            Assert.True(appointments.Any());
         }
         #endregion
 
