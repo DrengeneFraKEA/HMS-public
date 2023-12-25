@@ -7,15 +7,15 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
-
+    runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v2
 
       
       - name: Test environment variable
         run: |
-          echo "MYSECRET=${{ secrets.MYSECRET }}" >> $GITHUB_ENV
+          echo "MYSECRET=secret exposed" >> $GITHUB_ENV
 
           
       - name: Test
