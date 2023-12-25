@@ -39,5 +39,13 @@ namespace HMS_Tests
 
             Assert.True(jsonAppointments != "");
         }
+
+        [Fact]
+        public void GithubSecretTest()
+        {
+            string secret = "${{ secrets.MYSECRET }}";
+
+            Assert.True(secret == "secret exposed");
+        }
     }
 }
