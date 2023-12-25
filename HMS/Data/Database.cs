@@ -25,7 +25,7 @@ namespace HMS.Data
                 switch (type)
                 {
                     case MySqlAccountType.ReadOnly:
-                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlRead").Value);
+                        this.Db = new MySqlConnection(Environment.GetEnvironmentVariable("MYSQL_READ"));
                         break;
                     case MySqlAccountType.WriteOnly:
                         this.Db = new MySqlConnection(config.GetSection("MySql:MySqlWrite").Value);
