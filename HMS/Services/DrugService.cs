@@ -70,9 +70,10 @@ public class DrugService
     /// </summary>
     /// <param name="drugsearch"></param>
     /// <returns></returns>
-    public string GetDrugByName(string drugsearch) 
+    public List<DTO.Drug> GetDrugByName(string drugsearch) 
     {
         List<DTO.Drug> drugs = new List<DTO.Drug>();
+        if (drugsearch == string.Empty) return drugs;
 
         using (HttpClient client = new HttpClient())
         {
@@ -83,7 +84,7 @@ public class DrugService
                 JObject jsonObject = JObject.Parse(result);
 
                 JArray conceptProperties = (JArray)jsonObject?["drugGroup"]?["conceptGroup"]?[1]?["conceptProperties"];
-                if (conceptProperties == null) return JsonSerializer.Serialize(drugs); // No results found. Return empty list.
+                if (conceptProperties == null) return drugs; // No results found. Return empty list.
 
                 foreach (var conceptProperty in conceptProperties)
                 {
@@ -99,7 +100,7 @@ public class DrugService
             }
         }
 
-        return JsonSerializer.Serialize(drugs);
+        return drugs;
     }
 
     public string GetDrugsWithPrescriptions()

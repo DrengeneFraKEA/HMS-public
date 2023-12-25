@@ -118,5 +118,63 @@ namespace HMS_Tests
             Assert.True(createdSuccesful && updatedSuccessful && deleteSuccessful);
         }
         #endregion
+
+        #region Drug_service
+        /// <summary>
+        /// Public Drug API
+        /// </summary>
+        [Theory]
+        [InlineData("Cymbalta", false)]
+        [InlineData("Aspirin", false)]
+        [InlineData("DrugThatDoesntExist", true)]
+        [InlineData("", true)]
+        public void GetDrugByName(string drugname, bool expectedToFail) 
+        {
+            DrugService ds = new DrugService();
+
+            List<HMS.DTO.Drug> drugs = ds.GetDrugByName(drugname);
+
+            Assert.True(drugs.Any() || !drugs.Any() && expectedToFail);
+        }
+        #endregion
+
+        #region Journal_service
+        [Fact]
+        public void GetJournalsByDoctorId() 
+        {
+            JournalService js = new JournalService();
+            Database.SelectedDatabase = 0; // MySql
+
+            List<HMS.DTO.Journal> journals = js.GetJournals(1); // Assuming doctor with id 1 exists
+
+            Assert.True(journals.Any());
+        }
+
+        /// <summary>
+        /// CRUD test for journal for mysql and neo4j databases.
+        /// </summary>
+        [Fact]
+        public void CRUDJournal() 
+        {
+            JournalService js = new JournalService();
+
+            // Create
+            string journaltext = "Patienten er syg i hovedet";
+            string cpr = "1234567896"; // Assuming it exists
+            string doctorId = "1"; // Assuming it exists
+
+            bool createdSucessful = js.CreateJournal(journaltext, cpr, doctorId, out int? createdJournalId);
+
+            // Update
+            string newJournalText = "Patienten er kureret!";
+
+            bool updateSucessful = js.UpdateJournal(createdJournalId.Value.ToString(), newJournalText);
+
+            // Delete
+            bool deleteSucessful = js.DeleteJournal(createdJournalId.Value.ToString());
+
+            Assert.True(createdSucessful && updateSucessful && deleteSucessful);
+        }
+        #endregion
     }
 }
