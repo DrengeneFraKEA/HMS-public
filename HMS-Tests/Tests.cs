@@ -217,8 +217,7 @@ namespace HMS_Tests
         [Fact]
         public void GenerateJwtToken() 
         {
-            IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-            JwtTokenGenerator jtg = new JwtTokenGenerator(config);
+            JwtTokenGenerator jtg = new JwtTokenGenerator();
             string username = "123";
             string role = "123";
 

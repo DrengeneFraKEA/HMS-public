@@ -7,23 +7,23 @@ namespace HMS.Utils
 {
     public class JwtTokenGenerator
     {
-        private readonly IConfiguration _configuration;
 
-        public JwtTokenGenerator(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public JwtTokenGenerator() { }
 
         public string GenerateToken(string username, string role)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
+            var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
+            var keyString = Environment.GetEnvironmentVariable("JWT_KEY").IsNullOrEmpty()
+            ? config["JwtSettings:Key"]
+            : Environment.GetEnvironmentVariable("JWT_KEY");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[] { new Claim(ClaimTypes.Name, username), new Claim(ClaimTypes.Role, role) };
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
+                issuer: config["JwtSettings:Issuer"] ??  Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                audience: config["JwtSettings:Audience"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
                 claims: claims,
                 expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds
@@ -31,5 +31,7 @@ namespace HMS.Utils
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+       
     }
 }
