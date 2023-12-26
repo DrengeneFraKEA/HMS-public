@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
- 
+
 
 builder.Services.AddTransient<MySqlConnection>(_ =>
     new MySqlConnection(builder.Configuration.GetConnectionString("Default")));

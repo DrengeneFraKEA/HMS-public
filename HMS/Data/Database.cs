@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using MySqlConnector;
 using Neo4j.Driver;
 
@@ -20,21 +21,29 @@ namespace HMS.Data
             public MySqlConnection Db { get; set; }
             public MySQLContext(MySqlAccountType type) 
             {
-                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
                 
                 switch (type)
                 {
                     case MySqlAccountType.ReadOnly:
-                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlRead").Value);
+                        var mysql_read = Environment.GetEnvironmentVariable("MYSQL_READ");
+                        this.Db = new MySqlConnection(mysql_read);
+                        if (mysql_read.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection("MySql:MySqlRead").Value);
                         break;
                     case MySqlAccountType.WriteOnly:
-                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlWrite").Value);
+                        var mysql_write = Environment.GetEnvironmentVariable("MYSQL_WRITE");
+                        this.Db = new MySqlConnection(mysql_write);
+                        if (mysql_write.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection("MySql:MySqlWrite").Value);
                         break;
                     case MySqlAccountType.ReadWrite:
-                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlReadWrite").Value);
+                        var mysql_readwrite = Environment.GetEnvironmentVariable("MYSQL_READWRITE");
+                        this.Db = new MySqlConnection(mysql_readwrite);
+                        if (mysql_readwrite.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection("MySql:MySqlReadWrite").Value);
                         break;
                     case MySqlAccountType.FullAdmin:
-                        this.Db = new MySqlConnection(config.GetSection("MySql:MySqlAdmin").Value);
+                        var mysql_admin = Environment.GetEnvironmentVariable("MYSQL_ADMIN");
+                        this.Db = new MySqlConnection(mysql_admin);
+                        if (mysql_admin.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection("MySql:MySqlAdmin").Value);
                         break;
                 }
             }
@@ -46,9 +55,10 @@ namespace HMS.Data
             public MongoClientSettings Settings { get; set; }
             public MongoDbContext() 
             {
-                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
 
-                this.ConnectionString = config.GetSection("MongoDB:Connection").Value;
+                this.ConnectionString = Environment.GetEnvironmentVariable("MONGODB_CONN");
+                if (this.ConnectionString == null) this.ConnectionString = config.GetSection("MongoDB:Connection").Value;
                 this.Settings = MongoClientSettings.FromConnectionString(ConnectionString);
                 this.Settings.ServerApi = new ServerApi(ServerApiVersion.V1);
             }
@@ -59,11 +69,16 @@ namespace HMS.Data
             public IDriver Neo4jDriver { get; set; }
             public GraphQlContext() 
             {
-                var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-                var neo4jConnection = config.GetSection("Neo4jSettings:Neo4jConnection").Value;
-                var neo4jUser = config.GetSection("Neo4jSettings:Neo4jUser").Value;
-                var neo4jPassword = config.GetSection("Neo4jSettings:Neo4jPassword").Value;
+                var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
 
+                var neo4jConnection = Environment.GetEnvironmentVariable("NEO4J_CONN");
+                if (neo4jConnection.IsNullOrEmpty()) neo4jConnection = config.GetSection("Neo4jSettings:Neo4jConnection").Value;
+                
+                var neo4jUser = Environment.GetEnvironmentVariable("NEO4J_USER");
+                if (neo4jUser.IsNullOrEmpty()) neo4jUser = config.GetSection("Neo4jSettings:Neo4jUser").Value;
+
+                var neo4jPassword = Environment.GetEnvironmentVariable("NEO4J_PASSWORD");
+                if (neo4jPassword.IsNullOrEmpty()) neo4jPassword = config.GetSection("Neo4jSettings:Neo4jPassword").Value;
 
                 var neo4jUri = new Uri(neo4jConnection);
 

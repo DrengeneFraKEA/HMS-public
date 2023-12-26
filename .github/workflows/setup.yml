@@ -1,0 +1,29 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - ci_pipeline
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      
+      - name: Environment variables
+        run: |
+          echo "MYSECRET="${{ secrets.MYSECRET }}"" >> $GITHUB_ENV
+          echo "NEO4J_CONN="${{ secrets.NEO4J_CONN }}"" >> $GITHUB_ENV
+          echo "NEO4J_USER="${{ secrets.NEO4J_USER }}"" >> $GITHUB_ENV
+          echo "NEO4J_PASSWORD="${{ secrets.NEO4J_PASSWORD }}"" >> $GITHUB_ENV
+          echo "MYSQL_READ="${{ secrets.MYSQL_READ }}"" >> $GITHUB_ENV
+          echo "MYSQL_WRITE="${{ secrets.MYSQL_WRITE }}"" >> $GITHUB_ENV
+          echo "MYSQL_READWRITE="${{ secrets.MYSQL_READWRITE }}"" >> $GITHUB_ENV
+          echo "MYSQL_ADMIN="${{ secrets.MYSQL_ADMIN }}"" >> $GITHUB_ENV
+          echo "MONGODB_CONN="${{ secrets.MONGODB_CONN }}"" >> $GITHUB_ENV
+          
+      - name: Test
+        run: dotnet test
