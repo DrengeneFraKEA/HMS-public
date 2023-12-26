@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using MySqlConnector;
 using Neo4j.Driver;
 using System.Data;
+using System.Globalization;
 using System.Text.Json;
 
 namespace HMS.Services
@@ -104,13 +105,13 @@ namespace HMS.Services
                         {
                             var node = record["a"].As<INode>();
                             var props = node.Properties;
-
+                            IFormatProvider format = new CultureInfo("da-DK");
                             return new DTO.Appointment
                             {
                                 Id = int.Parse(props["appointment_id"].ToString()),
                                 Place = props["place"].ToString(),
-                                Start = DateTime.Parse((string)props["appointment_date"]),
-                                End = DateTime.Parse((string)props["appointment_date_end"])
+                                Start = DateTime.Parse(props["appointment_date"].ToString(), format),
+                                End = DateTime.Parse(props["appointment_date_end"].ToString(), format)
                             };
                             
                         }).ToList();
