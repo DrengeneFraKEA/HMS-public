@@ -3,6 +3,10 @@ using HMS.Data;
 using HMS.DTO;
 using HMS.Models;
 using HMS.Services;
+using HMS.Utils;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace HMS_Tests
 {
@@ -134,7 +138,7 @@ namespace HMS_Tests
 
             List<HMS.DTO.Drug> drugs = ds.GetDrugByName(drugname);
 
-            Assert.True(drugs.Any() || !drugs.Any() && expectedToFail);
+            Assert.True(drugs.Any() && !expectedToFail || !drugs.Any() && expectedToFail);
         }
         #endregion
 
@@ -174,6 +178,71 @@ namespace HMS_Tests
             bool deleteSucessful = js.DeleteJournal(createdJournalId.Value.ToString());
 
             Assert.True(createdSucessful && updateSucessful && deleteSucessful);
+        }
+        #endregion
+
+        #region person_service
+        [Fact]
+        public void GetPersonById() 
+        {
+            PersonService ps = new PersonService();
+            Database.SelectedDatabase = 0;
+            int id = 1;
+
+            HMS.DTO.Person person = ps.GetPersonData(id);
+
+            Assert.NotNull(person);
+        }
+
+        [Theory]
+        [InlineData("1234567896", false)]
+        [InlineData("11111", true)]
+        [InlineData("", true)]
+        [InlineData("0000000000", true)]
+        [InlineData("abc", true)]
+        public void DoesPersonExistByCPR(string cpr, bool expectedToFail) 
+        {
+            PersonService ps = new PersonService();
+            Database.SelectedDatabase = 0;
+
+            bool exists = ps.DoesPersonExistByCPR(cpr);
+
+            Assert.True(exists && !expectedToFail || !exists && expectedToFail);
+        }
+        #endregion
+
+        #region JWT
+        [Fact]
+        public void GenerateJwtToken() 
+        {
+            IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            JwtTokenGenerator jtg = new JwtTokenGenerator(config);
+            string username = "123";
+            string role = "123";
+
+            string token = jtg.GenerateToken(username, role);
+
+            Assert.True(!token.IsNullOrEmpty());
+        }
+        #endregion
+
+        #region sql_injection_sanitazation
+        [Theory]
+        [InlineData("1234567890", false)]
+        [InlineData("12345", true)]
+        [InlineData("1--DROP;", true)]
+        [InlineData("0000000000", true)]
+        public void CheckCredentials(string val, bool expectedToFail) 
+        {
+            Account a = new Account()
+            {
+                Username = val,
+                Password = val
+            };
+
+            bool valid = a.CheckUserCredentials(a);
+
+            Assert.True(valid && !expectedToFail || !valid && expectedToFail);
         }
         #endregion
     }

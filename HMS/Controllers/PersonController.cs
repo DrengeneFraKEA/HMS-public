@@ -18,7 +18,7 @@ namespace HMS.Controllers
         [HttpPost("{id}")]
         public string GetPersonData(int id)
         {
-            return personService.GetPersonData(id);
+            return JsonSerializer.Serialize(personService.GetPersonData(id));
         }
 
         [Authorize]
