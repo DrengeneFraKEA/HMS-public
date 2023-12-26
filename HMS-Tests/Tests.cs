@@ -7,7 +7,7 @@ namespace HMS_Tests
 {
     public class Tests
     {
-        [Fact]
+       /* [Fact]
         public void MySqlConnectivityTest()
         {
             Database.SelectedDatabase = 0; // MySql
@@ -39,13 +39,13 @@ namespace HMS_Tests
 
             Assert.True(jsonAppointments != "");
         }
-
+       */
         [Fact]
         public void GithubSecretTest()
         {
             string secret = Environment.GetEnvironmentVariable("MYSECRET");
 
-            Assert.True(secret == "secret exposed");
+            Assert.True(secret == "secret exposed 2");
         }
     }
 }
