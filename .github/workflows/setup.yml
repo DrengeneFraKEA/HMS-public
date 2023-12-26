@@ -19,6 +19,7 @@ jobs:
           echo "NEO4J_CONN="${{ secrets.NEO4J_CONN }}"" >> $GITHUB_ENV
           echo "NEO4J_USER="${{ secrets.NEO4J_USER }}"" >> $GITHUB_ENV
           echo "NEO4J_PASSWORD="${{ secrets.NEO4J_PASSWORD }}"" >> $GITHUB_ENV
+          echo "MYSQL_READ="${{ secrets.MYSQL_READ }}"" >> $GITHUB_ENV 
           
       - name: Test
         run: dotnet test
