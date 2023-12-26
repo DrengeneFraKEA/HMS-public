@@ -26,7 +26,7 @@ namespace HMS.DTO
                 string.IsNullOrEmpty(user.Password) ||
                 SqlInjectionPrevention.CheckString(user.Password) ||
                 SqlInjectionPrevention.CheckString(user.Username) ||
-                int.TryParse(user.Username, out _) == false) return false;
+                int.TryParse(user.Username, out int parsed) == false || parsed == 0) return false;
             else
                 return true;
         }

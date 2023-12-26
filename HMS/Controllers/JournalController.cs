@@ -1,6 +1,7 @@
 ﻿using HMS.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace HMS.Controllers
 {
@@ -18,14 +19,14 @@ namespace HMS.Controllers
         [HttpGet("doctor/{doctorId}")]
         public string Journal(int doctorId) 
         {
-            return journalService.GetJournals(doctorId);
+            return JsonSerializer.Serialize(journalService.GetJournals(doctorId));
         }
 
         [Authorize]
         [HttpGet("text/{journaltext}/cpr/{cpr}/doctor/{doctorid}")]
         public bool CreateJournal(string journaltext, string cpr, string doctorid)
         {
-            return journalService.CreateJournal(journaltext, cpr, doctorid);
+            return journalService.CreateJournal(journaltext, cpr, doctorid, out _);
         }
 
         [Authorize]
