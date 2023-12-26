@@ -7,6 +7,7 @@ namespace HMS_Tests
 {
     public class Tests
     {
+        /*
         [Fact]
         public void MySqlConnectivityTest()
         {
@@ -17,7 +18,7 @@ namespace HMS_Tests
 
             Assert.True(jsonAppointments != "");
         }
-        /*
+        
         [Fact]
         public void MongoDbConnectivityTest()
         {
@@ -28,6 +29,7 @@ namespace HMS_Tests
 
             Assert.True(jsonAppointments != "");
         }
+        */
 
         [Fact]
         public void Neo4jConnectivityTest()
@@ -39,7 +41,7 @@ namespace HMS_Tests
 
             Assert.True(jsonAppointments != "");
         }
-       */
+       
         [Fact]
         public void GithubSecretTest()
         {

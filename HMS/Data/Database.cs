@@ -60,10 +60,10 @@ namespace HMS.Data
             public IDriver Neo4jDriver { get; set; }
             public GraphQlContext() 
             {
-                var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
-                var neo4jConnection = config.GetSection("Neo4jSettings:Neo4jConnection").Value;
-                var neo4jUser = config.GetSection("Neo4jSettings:Neo4jUser").Value;
-                var neo4jPassword = config.GetSection("Neo4jSettings:Neo4jPassword").Value;
+                //var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
+                var neo4jConnection = Environment.GetEnvironmentVariable("NEO4J_CONN");
+                var neo4jUser = Environment.GetEnvironmentVariable("NEO4J_USER");
+                var neo4jPassword = Environment.GetEnvironmentVariable("NEO4J_PASSWORD");
 
 
                 var neo4jUri = new Uri(neo4jConnection);
