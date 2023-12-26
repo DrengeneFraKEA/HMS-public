@@ -109,8 +109,8 @@ namespace HMS.Services
                             {
                                 Id = int.Parse(props["appointment_id"].ToString()),
                                 Place = props["place"].ToString(),
-                                Start = DateTime.Parse((string)props["appointment_date"].ToString()),
-                                End = DateTime.Parse(props["appointment_date_end"].ToString())
+                                Start = DateTime.Parse((string)props["appointment_date"]),
+                                End = DateTime.Parse((string)props["appointment_date_end"])
                             };
                             
                         }).ToList();

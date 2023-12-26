@@ -31,7 +31,7 @@ namespace HMS_Tests
             Assert.True(jsonAppointments != "");
         }
         
-        /*
+        
         [Fact]
         public void Neo4jConnectivityTest()
         {
@@ -42,7 +42,7 @@ namespace HMS_Tests
 
             Assert.True(jsonAppointments != "");
         }
-       */
+       
         [Fact]
         public void GithubSecretTest()
         {
