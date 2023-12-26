@@ -47,9 +47,9 @@ namespace HMS.Data
             public MongoClientSettings Settings { get; set; }
             public MongoDbContext() 
             {
-                IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
+                //IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
 
-                this.ConnectionString = config.GetSection("MongoDB:Connection").Value;
+                this.ConnectionString = Environment.GetEnvironmentVariable("MONGODB_CONN");
                 this.Settings = MongoClientSettings.FromConnectionString(ConnectionString);
                 this.Settings.ServerApi = new ServerApi(ServerApiVersion.V1);
             }
