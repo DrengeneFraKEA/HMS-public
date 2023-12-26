@@ -17,9 +17,9 @@ namespace KEA_Final1.Controllers
     {
         private readonly JwtTokenGenerator jwtTokenGenerator;
 
-        public LoginController(IConfiguration configuration)
+        public LoginController()
         {
-            jwtTokenGenerator = new JwtTokenGenerator(configuration);
+            jwtTokenGenerator = new JwtTokenGenerator();
         }
 
         [AllowAnonymous]

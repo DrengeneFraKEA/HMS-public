@@ -10,11 +10,11 @@ namespace HMS.Services
 {
     public class JournalService
     {
-        public string GetJournals(int doctorid) 
+        public List<DTO.Journal> GetJournals(int doctorid) 
         {
             List<DTO.Journal> journals = new List<DTO.Journal>();
 
-            switch (Database.SelectedDatabase) 
+            switch (Database.SelectedDatabase)
             {
                 case 0:
                     Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
@@ -44,13 +44,17 @@ namespace HMS.Services
                     break;
             }
 
-            return JsonSerializer.Serialize(journals);
+            return journals;
         }
 
-        public bool CreateJournal(string journaltext, string cpr, string doctorid) 
+        public bool CreateJournal(string journaltext, string cpr, string doctorid, out int? lastId) 
         {
             bool legit = cpr.Length == 10 && int.TryParse(cpr, out _);
-            if (!legit) return false;
+            if (!legit) 
+            {
+                lastId = null;
+                return false;
+            }
 
             // MySQL
             DateTime dt = DateTime.Now;
@@ -64,12 +68,13 @@ namespace HMS.Services
 
             command.ExecuteReader();
 
-            var lastID = command.LastInsertedId;
+            int lastInsertedId = int.Parse(command.LastInsertedId.ToString());
+            lastId = lastInsertedId;
 
             mysql.Db.Close();
 
             // MongoDB
-
+            // WIP..
 
             // GraphQL
             Database.GraphQlContext gdbc = new Database.GraphQlContext();
@@ -78,7 +83,7 @@ namespace HMS.Services
             var createJournal = session.ExecuteWrite(tx =>
             {
                 var res = tx.Run($@"CREATE (j:Journal {{ 
-                    journal_id: {lastID}, 
+                    journal_id: {lastInsertedId}, 
                     doctor_id: '{doctorid}', 
                     journalnotes: '{journaltext}', 
                     created_on: '{now}',
@@ -92,6 +97,7 @@ namespace HMS.Services
 
                 return res;
             });
+
             return true;
         }
 

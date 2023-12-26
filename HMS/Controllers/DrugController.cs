@@ -6,6 +6,7 @@ using MySqlConnector;
 using Microsoft.Extensions.Options;
 using HMS.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
 
 namespace HMS.Controllers;
 
@@ -29,7 +30,7 @@ public class DrugController : ControllerBase
     [HttpGet("{drugsearch}")]
     public string GetDrugByName(string drugsearch) 
     {
-        return drugService.GetDrugByName(drugsearch);
+        return JsonSerializer.Serialize(drugService.GetDrugByName(drugsearch));
     }
 
     [HttpGet("drug_prescriptions")]

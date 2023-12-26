@@ -7,9 +7,10 @@ namespace HMS.Services
 {
     public class PersonService
     {
-        public string GetPersonData(int id) 
+        public DTO.Person GetPersonData(int id) 
         {
-            DTO.Person person = new Person();
+            DTO.Person person = null;
+
             switch (Database.SelectedDatabase) 
             {
                 case 0:
@@ -39,7 +40,7 @@ namespace HMS.Services
                     break;
             }
 
-            return JsonSerializer.Serialize(person);
+            return person;
         }
 
         public bool DoesPersonExistByCPR(string cpr)
