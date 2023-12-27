@@ -69,6 +69,7 @@ namespace HMS_Tests
             HMS.Models.Appointment appointment = aps.GetAppointmentById(randomAppointmentId.Value.ToString());
 
             Assert.NotNull(appointment);
+
         }
 
         /// <summary>
@@ -112,7 +113,7 @@ namespace HMS_Tests
             };
 
             bool createdSuccesful = aps.CreateAppointment(appointment, out int? createdAppointmentId);
-
+            Assert.NotNull(createdAppointmentId);
             // Update
             appointment.AppointmentDate = DateTime.Now.AddHours(2);
             appointment.AppointmentDateEnd = DateTime.Now.AddHours(3);
@@ -123,6 +124,102 @@ namespace HMS_Tests
 
             Assert.True(createdSuccesful && updatedSuccessful && deleteSuccessful);
         }
+
+
+        [Fact]
+        public void GetAppointmentBySpecificId()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("1");
+
+            Assert.NotNull(appointment);
+            Assert.Equal(1, appointment.AppointmentId);
+        }
+
+        [Fact]
+        public void GetAppointmentByInvalidId()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("50");
+
+            Assert.Null(appointment);
+        }
+
+        [Fact]
+        public void GetAppointmentByPatientId()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1);
+
+            Assert.NotNull(appointments);
+            Assert.NotEmpty(appointments);
+        }
+
+        [Theory]
+        [InlineData(-1)] 
+        [InlineData(0)] 
+        [InlineData(0.1)]
+        public void GetAppointmentByPatientInvalidId(int id)
+        {
+            AppointmentService aps = new AppointmentService();
+
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(id);
+
+            Assert.Empty(appointments);
+        }
+
+        [Fact]
+        public void CreateAppointmentFalse()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            bool createdSuccesful = aps.CreateAppointment(null, out int? createdAppointmentId);
+
+            Assert.False(createdSuccesful);
+            Assert.Null(createdAppointmentId);
+        }
+
+        [Fact]
+        public void GetAppointmentByIdEquals()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("1");
+
+            Assert.NotNull(appointment);
+            Assert.Equal(1, appointment.AppointmentId);
+            Assert.Equal(1, appointment.PatientId);
+            Assert.Equal(1, appointment.DoctorId);
+            Assert.Equal(1, appointment.DepartmentId);
+            Assert.Equal(1, appointment.HospitalId);
+        }
+
+        [Fact]
+        public void GetAppointmentsByPatientIdMongoDB()
+        {
+            Database.SelectedDatabase = 1;
+            
+            AppointmentService aps = new AppointmentService();
+
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1);
+
+            Assert.NotNull(appointments);
+        }
+        [Fact]
+        public void GetAppointmentsByPatientIdNeo4j()
+        {
+            Database.SelectedDatabase = 2;
+          
+            AppointmentService aps = new AppointmentService();
+
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(2);
+
+            Assert.NotNull(appointments);
+        }
+
         #endregion
 
         #region Drug_service
