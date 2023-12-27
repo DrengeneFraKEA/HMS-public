@@ -123,6 +123,37 @@ namespace HMS_Tests
 
             Assert.True(createdSuccesful && updatedSuccessful && deleteSuccessful);
         }
+
+        [Fact]
+        public void GetAppointmentByInvalidId()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("50");
+
+            Assert.Null(appointment);
+        }
+
+        [Fact]
+        public void GetAppointmentByPatientId()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1);
+
+            Assert.NotNull(appointments);
+            Assert.NotEmpty(appointments);
+        }
+
+        [Fact]
+        public void GetAppointmentByPatientInvalidId()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(50);
+
+            Assert.Empty(appointments);
+        }
         #endregion
 
         #region Drug_service
