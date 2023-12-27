@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
@@ -32,19 +32,26 @@ jobs:
 
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
 
-      - name: Install SonarCloud scanner and dotnet-coverage
+      - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+          $env:Path += ";$(Get-Item -Path .\.sonar\scanner).FullName"
+
+      - name: Install dotnet-coverage
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
           dotnet tool install -g dotnet-coverage
+          $env:Path += ";$(Get-Command dotnet-coverage | Select-Object -ExpandProperty DirectoryName)"
 
       - name: Build and analyze
         env:
