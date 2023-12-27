@@ -14,7 +14,11 @@ namespace HMS.Controllers
         [HttpPost]
         public IActionResult ChangeDatabase([FromBody] JsonObject value) 
         {
-            Database.SelectedDatabase = int.Parse(value["value"].ToString());
+            if (value != null && value["value"] != null)
+                Database.SelectedDatabase = int.Parse(value["value"].ToString());
+            else
+                Database.SelectedDatabase = 0; // Default to MySQL
+
             return Ok();
         }
     }
