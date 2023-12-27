@@ -69,6 +69,7 @@ namespace HMS_Tests
             HMS.Models.Appointment appointment = aps.GetAppointmentById(randomAppointmentId.Value.ToString());
 
             Assert.NotNull(appointment);
+
         }
 
         /// <summary>
@@ -112,7 +113,11 @@ namespace HMS_Tests
             };
 
             bool createdSuccesful = aps.CreateAppointment(appointment, out int? createdAppointmentId);
-
+            Assert.True(createdSuccesful);
+            Assert.NotNull(createdAppointmentId);
+            Assert.Equal(1, appointment.PatientId);
+            Assert.Equal(1, appointment.DoctorId);
+            Assert.Equal(1, appointment.DepartmentId);
             // Update
             appointment.AppointmentDate = DateTime.Now.AddHours(2);
             appointment.AppointmentDateEnd = DateTime.Now.AddHours(3);
@@ -154,6 +159,60 @@ namespace HMS_Tests
 
             Assert.Empty(appointments);
         }
+
+        [Fact]
+        public void CreateAppointmentFalse()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            bool createdSuccesful = aps.CreateAppointment(null, out int? createdAppointmentId);
+
+            Assert.False(createdSuccesful);
+            Assert.Null(createdAppointmentId);
+        }
+
+        [Fact]
+        public void GetAppointmentByIdEquals()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("1");
+
+            Assert.NotNull(appointment);
+            Assert.Equal(1, appointment.AppointmentId);
+            Assert.Equal(1, appointment.PatientId);
+            Assert.Equal(1, appointment.DoctorId);
+            Assert.Equal(1, appointment.DepartmentId);
+            Assert.Equal(1, appointment.HospitalId);
+        }
+
+        public void GetAppointmentsByPatientIdMongoDB()
+        {
+            if (Database.SelectedDatabase != 1)
+            {
+                return;
+            }
+            AppointmentService aps = new AppointmentService();
+
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1);
+
+            Assert.NotNull(appointments);
+        }
+        [Fact]
+        public void GetAppointmentsByPatientIdNeo4j()
+        {
+            if (Database.SelectedDatabase != 2)
+            {
+                return;
+            }
+            AppointmentService aps = new AppointmentService();
+
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(2);
+
+            Assert.NotNull(appointments);
+
+        }
+
         #endregion
 
         #region Drug_service
