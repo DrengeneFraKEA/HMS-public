@@ -113,11 +113,7 @@ namespace HMS_Tests
             };
 
             bool createdSuccesful = aps.CreateAppointment(appointment, out int? createdAppointmentId);
-            Assert.True(createdSuccesful);
             Assert.NotNull(createdAppointmentId);
-            Assert.Equal(1, appointment.PatientId);
-            Assert.Equal(1, appointment.DoctorId);
-            Assert.Equal(1, appointment.DepartmentId);
             // Update
             appointment.AppointmentDate = DateTime.Now.AddHours(2);
             appointment.AppointmentDateEnd = DateTime.Now.AddHours(3);
@@ -127,6 +123,119 @@ namespace HMS_Tests
             bool deleteSuccessful = aps.DeleteAppointment(createdAppointmentId.Value);
 
             Assert.True(createdSuccesful && updatedSuccessful && deleteSuccessful);
+        }
+
+        [Fact]
+        public void CRUDAppointmentMongoDB()
+        {
+            Database.SelectedDatabase = 1;
+            // Create
+            AppointmentService aps = new AppointmentService();
+
+            HMS.Models.Appointment appointment = new HMS.Models.Appointment()
+            {
+                PatientId = 1,
+                DoctorId = 1,
+                ClinicId = 1,
+                Patient = new Patient()
+                {
+                    PatientId = 1
+                },
+                DepartmentId = 1,
+                HospitalId = 1,
+                AppointmentDate = DateTime.Now,
+                AppointmentDateEnd = DateTime.Now.AddHours(1),
+                Clinic = new Clinic()
+                {
+                    Name = "København Sundhedshus",
+                    Department = null,
+                    Doctor = new Doctor()
+                    {
+                        DoctorId = 1
+                    }
+                },
+                Hospital = new Hospital()
+                {
+                    HospitalId = 1,
+                    Name = "København Sundhedshus",
+                    Department = "ICU",
+                    DoctorId = 1
+                },
+            };
+
+            bool createdSuccesful = aps.CreateAppointment(appointment, out int? createdAppointmentId);
+            Assert.NotNull(createdAppointmentId);
+            // Update
+            appointment.AppointmentDate = DateTime.Now.AddHours(2);
+            appointment.AppointmentDateEnd = DateTime.Now.AddHours(3);
+            bool updatedSuccessful = aps.UpdateAppointment(appointment);
+
+            // Delete
+            bool deleteSuccessful = aps.DeleteAppointment(createdAppointmentId.Value);
+
+            Assert.True(createdSuccesful && updatedSuccessful && deleteSuccessful);
+        }
+
+        [Fact]
+        public void CRUDAppointmentNeo4j()
+        {
+            Database.SelectedDatabase = 2;
+            // Create
+            AppointmentService aps = new AppointmentService();
+
+            HMS.Models.Appointment appointment = new HMS.Models.Appointment()
+            {
+                PatientId = 1,
+                DoctorId = 1,
+                ClinicId = 1,
+                Patient = new Patient()
+                {
+                    PatientId = 1
+                },
+                DepartmentId = 1,
+                HospitalId = 1,
+                AppointmentDate = DateTime.Now,
+                AppointmentDateEnd = DateTime.Now.AddHours(1),
+                Clinic = new Clinic()
+                {
+                    Name = "København Sundhedshus",
+                    Department = null,
+                    Doctor = new Doctor()
+                    {
+                        DoctorId = 1
+                    }
+                },
+                Hospital = new Hospital()
+                {
+                    HospitalId = 1,
+                    Name = "København Sundhedshus",
+                    Department = "ICU",
+                    DoctorId = 1
+                },
+            };
+
+            bool createdSuccesful = aps.CreateAppointment(appointment, out int? createdAppointmentId);
+            Assert.NotNull(createdAppointmentId);
+            // Update
+            appointment.AppointmentDate = DateTime.Now.AddHours(2);
+            appointment.AppointmentDateEnd = DateTime.Now.AddHours(3);
+            bool updatedSuccessful = aps.UpdateAppointment(appointment);
+
+            // Delete
+            bool deleteSuccessful = aps.DeleteAppointment(createdAppointmentId.Value);
+
+            Assert.True(createdSuccesful && updatedSuccessful && deleteSuccessful);
+        }
+
+        [Fact]
+        public void GetAppointmentBySpecificId()
+        {
+            AppointmentService aps = new AppointmentService();
+
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("1");
+
+            Assert.NotNull(appointment);
+            Assert.Equal(1, appointment.AppointmentId);
         }
 
         [Fact]
@@ -150,12 +259,15 @@ namespace HMS_Tests
             Assert.NotEmpty(appointments);
         }
 
-        [Fact]
-        public void GetAppointmentByPatientInvalidId()
+        [Theory]
+        [InlineData(-1)] 
+        [InlineData(0)] 
+        [InlineData(0.1)]
+        public void GetAppointmentByPatientInvalidId(int id)
         {
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(50);
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(id);
 
             Assert.Empty(appointments);
         }
@@ -186,12 +298,11 @@ namespace HMS_Tests
             Assert.Equal(1, appointment.HospitalId);
         }
 
+        [Fact]
         public void GetAppointmentsByPatientIdMongoDB()
         {
-            if (Database.SelectedDatabase != 1)
-            {
-                return;
-            }
+            Database.SelectedDatabase = 1;
+            
             AppointmentService aps = new AppointmentService();
 
             List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1);
@@ -201,16 +312,13 @@ namespace HMS_Tests
         [Fact]
         public void GetAppointmentsByPatientIdNeo4j()
         {
-            if (Database.SelectedDatabase != 2)
-            {
-                return;
-            }
+            Database.SelectedDatabase = 2;
+          
             AppointmentService aps = new AppointmentService();
 
             List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(2);
 
             Assert.NotNull(appointments);
-
         }
 
         #endregion

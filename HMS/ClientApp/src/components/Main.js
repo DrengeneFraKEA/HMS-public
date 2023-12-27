@@ -6,7 +6,7 @@ import axios from 'axios';
 
 export class Main extends Component {
     static displayName = Main.name;
-
+    hiddentoken = "";
     constructor(props) {
         super(props);
         this.state = {
@@ -22,6 +22,8 @@ export class Main extends Component {
             window.location.href = '/';
             return;
         }
+
+        this.hiddentoken = token;
 
         // Fetch person data
         try {
