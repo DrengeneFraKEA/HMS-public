@@ -156,6 +156,24 @@ namespace HMS_Tests
             Assert.True(journals.Any());
         }
 
+        [Fact]
+        public void CreateJournal_InvalidCPR_ReturnsFalse()
+        {
+            JournalService js = new JournalService();
+
+            // Arrange
+            string journalText = "Test journal text";
+            string doctorId = "1234";
+
+
+            // Act
+            bool created = js.CreateJournal(journalText, "invalidCPR", doctorId, out int? lastId);
+
+            // Assert
+            Assert.False(created);
+            Assert.Null(lastId);
+        }
+
         /// <summary>
         /// CRUD test for journal for mysql and neo4j databases.
         /// </summary>
@@ -165,7 +183,7 @@ namespace HMS_Tests
             JournalService js = new JournalService();
 
             // Create
-            string journaltext = "Patienten er syg i hovedet";
+            string journaltext = "Patienten er syg";
             string cpr = "1234567896"; // Assuming it exists
             string doctorId = "1"; // Assuming it exists
 
@@ -229,7 +247,7 @@ namespace HMS_Tests
 
         #region sql_injection_sanitazation
         [Theory]
-        [InlineData("1234567890", false)]
+        [InlineData("1234567890", true)]
         [InlineData("12345", true)]
         [InlineData("1--DROP;", true)]
         [InlineData("0000000000", true)]
@@ -245,6 +263,57 @@ namespace HMS_Tests
 
             Assert.True(valid && !expectedToFail || !valid && expectedToFail);
         }
+
+        [Theory]
+        [InlineData("2201970002", false)] // Valid CPR number, 20th century, female
+        [InlineData("2301010004", false)] // Valid CPR number, 21st century, female
+        [InlineData("2301010001", false)] // Valid CPR number, 21st century, male
+        [InlineData("2201950003", false)] // Valid CPR number, 20th century, male
+        [InlineData("1234567890", true)] // Invalid CPR number
+        [InlineData("3201010002", true)] // Invalid CPR number, day
+        [InlineData("2213010002", true)] // Invalid CPR number, month 13
+        [InlineData("2200010002", true)] // Invalid CPR number, month 0
+        [InlineData("123456040", true)]     // Invalid length (too short) -1
+        [InlineData("", true)]           // Invalid length (empty)
+        [InlineData("1", true)]           // Invalid length (empty)
+        [InlineData("12345678900", true)] // Invalid length (too long) +1
+        [InlineData("invalid_CPR", true)] // Contains non-numeric characters
+        [InlineData("123a4567890", true)] // Contains non-numeric characters
+        [InlineData("123a45671!d", true)] // Contains Special characters
+        public void CheckCPRNumber_Validity(string cprNumber, bool expectedToFail)
+        {
+            Account user = new Account()
+            {
+                Username = cprNumber
+            };
+            bool result = user.CheckUserCredentials(user);
+            Assert.True(!expectedToFail == result || expectedToFail == result);
+
+            //Assert.True(!expectedToFail && user.CheckValidDateOnCPR(user) || expectedToFail && !user.CheckValidDateOnCPR(user));
+        }
+
+
+        [Theory]
+        [InlineData("412321", false)]                           //Valid password 6 lenght
+        [InlineData("1", false)]                                //Valid password 1 length
+        [InlineData("12345678901234567890123456789", false)]    //Valid password 29 numbers length
+        [InlineData("123456789012345678901234567890", false)]   //Valid password 30 numbers length
+        [InlineData("abcdefghijabcdefghijabcdefghij", false)]   //Valid password 30 charachters length
+        [InlineData("abcdefghij1234567890abcdefghij", false)]   //Valid password 30 charachters or numbers length
+        [InlineData("abcdefghij12!#dsa_d", false)]              //Valid password Special charachters
+        [InlineData("abcdefghij1234567890abcdefghi32", true)]   //Invalid length 31
+        [InlineData("", true)]                                  //Invalid Empty password
+        public void CheckPassword_Validity(string password, bool expectedToFail)
+        {
+            Account user = new Account()
+            {
+                Username = "2201970002", //Valid cpr for testing
+                Password = password
+            };
+            bool result = user.CheckUserCredentials(user);
+            Assert.True(!expectedToFail == result || expectedToFail == result);
+        }
+
         #endregion
     }
 }

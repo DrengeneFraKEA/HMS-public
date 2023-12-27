@@ -22,13 +22,33 @@ namespace HMS.DTO
         /// <returns></returns>
         public bool CheckUserCredentials(Account user)
         {
-            if (user.Username.Length != 10 ||
+            if (user.Username.Length != 10 || 
+                user.Username != "0000000000" ||
                 string.IsNullOrEmpty(user.Password) ||
+                user.Password.Length > 30 ||
                 SqlInjectionPrevention.CheckString(user.Password) ||
                 SqlInjectionPrevention.CheckString(user.Username) ||
-                int.TryParse(user.Username, out int parsed) == false || parsed == 0) return false;
+                !CheckValidDateOnCPR(user) ||
+                int.TryParse(user.Username, out _) == false) 
+                return false;
             else
                 return true;
+        }
+
+
+        public bool CheckValidDateOnCPR(Account user)
+        {
+            if (user.Username == string.Empty || user.Username == null || user.Username.Length != 10) return false;
+
+            string stringedDate = string.Empty;
+
+            stringedDate += user.Username.Substring(0, 2) + "-";
+            stringedDate += user.Username.Substring(2, 2) + "-";
+            stringedDate += "19" + user.Username.Substring(4, 2);
+
+            bool dateValid = DateTime.TryParse(stringedDate, out _);
+
+            return dateValid;
         }
     }
 }
