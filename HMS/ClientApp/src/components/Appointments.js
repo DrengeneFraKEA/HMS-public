@@ -14,6 +14,8 @@ export class Appointments extends Component {
         };
     }
 
+    
+
     componentDidMount() {
         // Check if user is logged in.
         var token = localStorage.getItem("token");
@@ -145,7 +147,7 @@ export class Appointments extends Component {
                                             onChange={(e) => this.handleAppointmentChange(appointment.Id, 'start', e)}
                                         />
                                     ) : (
-                                        <span>{appointment.Start}</span>
+                                        <span id="appointmentStart">{appointment.Start}</span>
                                     )}
                                 </div>
                                 <div className="column">
@@ -156,7 +158,7 @@ export class Appointments extends Component {
                                             onChange={(e) => this.handleAppointmentChange(appointment.Id, 'end', e)}
                                         />
                                     ) : (
-                                        <span>{appointment.End}</span>
+                                        <span id="appointmentEnd">{appointment.End}</span>
                                     )}
                                 </div>
                                 <div className="column">

@@ -98,7 +98,7 @@ export class Login extends Component {
                         <label htmlFor="password">Kodeord</label>
                         <input type="password" id="password"/>
                     </div>
-                    <button type="submit">Log ind</button>
+                    <button type="submit" id="loginbutton">Log ind</button>
                     <button onClick={this.Register}>Registrer</button>
                 </form>
                 <Link to="/main" className="submit-link" ref={this.submitLinkRef} />

@@ -49,11 +49,11 @@ export default class Navbar extends Component
         return (
             <nav className="navbar">
                 <div className="navbar-container">
-                    <Link to="/main" className="navbar-link">Hjem</Link>
-                    <Link to="/appointments" className="navbar-link">Henvisninger</Link>
-                    <Link to="/prescriptions" className="navbar-link">Recept</Link>
-                    <Link to="/journal" className="navbar-link">Journaler</Link>
-                    <Link to="/rating" className="navbar-link">Rating</Link>
+                    <Link to="/main" className="navbar-link" id="home">Hjem</Link>
+                    <Link to="/appointments" className="navbar-link" id="appointments">Henvisninger</Link>
+                    <Link to="/prescriptions" className="navbar-link" id="prescriptions">Recept</Link>
+                    <Link to="/journal" className="navbar-link" id="journals">Journaler</Link>
+                    <Link to="/rating" className="navbar-link" id="rating">Rating</Link>
                 </div>
 
                 <div className="dropdown">
