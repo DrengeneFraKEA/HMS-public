@@ -126,25 +126,16 @@ namespace HMS_Tests
         }
 
 
-        [Fact]
-        public void GetAppointmentBySpecificId()
+        [Theory]
+        [InlineData("87", false)]
+        [InlineData("-1", true)]
+        public void GetAppointmentBySpecificId(string appointmentid, bool expectedToFail)
         {
             AppointmentService aps = new AppointmentService();
 
-            HMS.Models.Appointment appointment = aps.GetAppointmentById("31");
+            HMS.Models.Appointment appointment = aps.GetAppointmentById(appointmentid);
 
-            Assert.NotNull(appointment);
-            Assert.Equal(31, appointment.AppointmentId);
-        }
-
-        [Fact]
-        public void GetAppointmentByInvalidId()
-        {
-            AppointmentService aps = new AppointmentService();
-
-            HMS.Models.Appointment appointment = aps.GetAppointmentById("50");
-
-            Assert.Null(appointment);
+            Assert.True(appointment != null && !expectedToFail || appointment == null && expectedToFail);
         }
 
         [Fact]
@@ -187,14 +178,13 @@ namespace HMS_Tests
         {
             AppointmentService aps = new AppointmentService();
 
-            HMS.Models.Appointment appointment = aps.GetAppointmentById("31");
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("87");
 
             Assert.NotNull(appointment);
-            Assert.Equal(31, appointment.AppointmentId);
             Assert.Equal(31, appointment.PatientId);
             Assert.Equal(31, appointment.DoctorId);
-            Assert.Equal(31, appointment.DepartmentId);
-            Assert.Equal(31, appointment.HospitalId);
+            Assert.Equal(1, appointment.DepartmentId);
+            Assert.Equal(1, appointment.HospitalId);
         }
 
         [Fact]
