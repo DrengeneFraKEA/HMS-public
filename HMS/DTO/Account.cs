@@ -23,14 +23,13 @@ namespace HMS.DTO
         /// <returns></returns>
         public bool CheckUserCredentials(Account user)
         {
-            if (user.Username.Length != 10 || 
+            if (user.Username.Length != 10 ||
                 user.Username == "0000000000" ||
                 string.IsNullOrEmpty(user.Password) ||
                 user.Password.Length > 30 ||
                 SqlInjectionPrevention.CheckString(user.Password) ||
                 SqlInjectionPrevention.CheckString(user.Username) ||
-                !CheckValidDateOnCPR(user) ||
-                int.TryParse(user.Username, out _) == false) 
+                !CheckValidDateOnCPR(user))
                 return false;
             else
                 return true;
