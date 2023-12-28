@@ -19,7 +19,7 @@ namespace HMS_Tests
             Database.SelectedDatabase = 0; // MySql
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(31); // Assuming patient with id 31 exists
 
             Assert.True(appointments.Any());
         }
@@ -31,7 +31,7 @@ namespace HMS_Tests
             Database.SelectedDatabase = 1; // MongoDB
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(31); // Assuming patient with id 31 exists
 
             Assert.True(appointments.Any());
         }
@@ -43,7 +43,7 @@ namespace HMS_Tests
             Database.SelectedDatabase = 2; // Neo4j
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(31); // Assuming patient with id 31 exists
 
             Assert.True(appointments.Any());
         }
@@ -131,10 +131,10 @@ namespace HMS_Tests
         {
             AppointmentService aps = new AppointmentService();
 
-            HMS.Models.Appointment appointment = aps.GetAppointmentById("1");
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("31");
 
             Assert.NotNull(appointment);
-            Assert.Equal(1, appointment.AppointmentId);
+            Assert.Equal(31, appointment.AppointmentId);
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace HMS_Tests
         {
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1);
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(31);
 
             Assert.NotNull(appointments);
             Assert.NotEmpty(appointments);
@@ -187,14 +187,14 @@ namespace HMS_Tests
         {
             AppointmentService aps = new AppointmentService();
 
-            HMS.Models.Appointment appointment = aps.GetAppointmentById("1");
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("31");
 
             Assert.NotNull(appointment);
-            Assert.Equal(1, appointment.AppointmentId);
-            Assert.Equal(1, appointment.PatientId);
-            Assert.Equal(1, appointment.DoctorId);
-            Assert.Equal(1, appointment.DepartmentId);
-            Assert.Equal(1, appointment.HospitalId);
+            Assert.Equal(31, appointment.AppointmentId);
+            Assert.Equal(31, appointment.PatientId);
+            Assert.Equal(31, appointment.DoctorId);
+            Assert.Equal(31, appointment.DepartmentId);
+            Assert.Equal(31, appointment.HospitalId);
         }
 
         [Fact]
@@ -248,7 +248,7 @@ namespace HMS_Tests
             JournalService js = new JournalService();
             Database.SelectedDatabase = 0; // MySql
 
-            List<HMS.DTO.Journal> journals = js.GetJournals(1); // Assuming doctor with id 1 exists
+            List<HMS.DTO.Journal> journals = js.GetJournals(31); // Assuming doctor with id 1 exists
 
             Assert.True(journals.Any());
         }
@@ -282,7 +282,7 @@ namespace HMS_Tests
             // Create
             string journaltext = "Patienten er syg";
             string cpr = "1234567896"; // Assuming it exists
-            string doctorId = "1"; // Assuming it exists
+            string doctorId = "31"; // Assuming it exists
 
             bool createdSucessful = js.CreateJournal(journaltext, cpr, doctorId, out int? createdJournalId);
 
@@ -304,7 +304,7 @@ namespace HMS_Tests
         {
             PersonService ps = new PersonService();
             Database.SelectedDatabase = 0;
-            int id = 1;
+            int id = 31;
 
             HMS.DTO.Person person = ps.GetPersonData(id);
 
@@ -383,10 +383,10 @@ namespace HMS_Tests
             {
                 Username = cprNumber
             };
-            bool result = user.CheckUserCredentials(user);
-            Assert.True(!expectedToFail == result || expectedToFail == result);
 
-            //Assert.True(!expectedToFail && user.CheckValidDateOnCPR(user) || expectedToFail && !user.CheckValidDateOnCPR(user));
+            bool result = user.CheckValidDateOnCPR(user);
+
+            Assert.True(!expectedToFail == result || expectedToFail == !result);
         }
 
 
@@ -410,7 +410,6 @@ namespace HMS_Tests
             bool result = user.CheckUserCredentials(user);
             Assert.True(!expectedToFail == result || expectedToFail == result);
         }
-
         #endregion
     }
 }
