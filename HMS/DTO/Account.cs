@@ -23,7 +23,7 @@ namespace HMS.DTO
         public bool CheckUserCredentials(Account user)
         {
             if (user.Username.Length != 10 || 
-                user.Username != "0000000000" ||
+                user.Username == "0000000000" ||
                 string.IsNullOrEmpty(user.Password) ||
                 user.Password.Length > 30 ||
                 SqlInjectionPrevention.CheckString(user.Password) ||
