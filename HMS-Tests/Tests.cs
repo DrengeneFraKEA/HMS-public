@@ -83,32 +83,32 @@ namespace HMS_Tests
 
             HMS.Models.Appointment appointment = new HMS.Models.Appointment()
             {
-                PatientId = 1,
-                DoctorId = 1,
+                PatientId = 31,
+                DoctorId = 31,
                 ClinicId = 1,
                 Patient = new Patient()
                 {
-                    PatientId = 1
+                    PatientId = 31
                 },
-                DepartmentId = 1,
-                HospitalId = 1,
+                DepartmentId = 2,
+                HospitalId = 2,
                 AppointmentDate = DateTime.Now,
                 AppointmentDateEnd = DateTime.Now.AddHours(1),
                 Clinic = new Clinic()
                 {
-                    Name = "København Sundhedshus",
+                    Name = "Rigshospitalet",
                     Department = null,
                     Doctor = new Doctor()
                     {
-                        DoctorId = 1
+                        DoctorId = 31
                     }
                 },
                 Hospital = new Hospital()
                 {
                     HospitalId = 1,
-                    Name = "København Sundhedshus",
+                    Name = "Rigshospitalet",
                     Department = "ICU",
-                    DoctorId = 1
+                    DoctorId = 31
                 },
             };
 

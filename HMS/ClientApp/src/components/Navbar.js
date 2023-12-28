@@ -53,7 +53,6 @@ export default class Navbar extends Component
                     <Link to="/appointments" className="navbar-link" id="appointments">Henvisninger</Link>
                     <Link to="/prescriptions" className="navbar-link" id="prescriptions">Recept</Link>
                     <Link to="/journal" className="navbar-link" id="journals">Journaler</Link>
-                    <Link to="/rating" className="navbar-link" id="rating">Rating</Link>
                 </div>
 
                 <div className="dropdown">

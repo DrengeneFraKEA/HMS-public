@@ -7,7 +7,7 @@ describe('HMS Basic Business Flow', () => {
 
     it('should try to login', () => {
 
-        var username = "1234567890";
+        var username = "1010101010";
         var password = "1234";
 
         cy.get('input[id="username"]').type(username);
@@ -17,7 +17,7 @@ describe('HMS Basic Business Flow', () => {
         cy.get('button[id="loginbutton"]').click();
 
         cy.request('POST', 'http://localhost:44402/login', { username: username, password: password }).then(({ body }) => {
-            expect(body.UserId).eq(1); // User logged in correctly?
+            expect(body.UserId).eq(31); // User logged in correctly?
             expect(body.Token).to.not.equal(""); // Is token legitimate?
             expect(body.Role).eq("doctor"); // Is there a role assigned?
         });
