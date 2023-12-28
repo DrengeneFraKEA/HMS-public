@@ -398,7 +398,7 @@ namespace HMS_Tests
                 Password = password
             };
             bool result = user.CheckUserCredentials(user);
-            Assert.True(!expectedToFail == result || expectedToFail == result);
+            Assert.True(!expectedToFail && result || expectedToFail && !result);
         }
         #endregion
     }
