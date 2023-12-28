@@ -366,12 +366,12 @@ namespace HMS_Tests
         [InlineData("2301010004", false)] // Valid CPR number, 21st century, female
         [InlineData("2301010001", false)] // Valid CPR number, 21st century, male
         [InlineData("2201950003", false)] // Valid CPR number, 20th century, male
-        [InlineData("1234567890", true)] // Invalid CPR number
-        [InlineData("3201010002", true)] // Invalid CPR number, day
-        [InlineData("2213010002", true)] // Invalid CPR number, month 13
-        [InlineData("2200010002", true)] // Invalid CPR number, month 0
-        [InlineData("123456040", true)]     // Invalid length (too short) -1
-        [InlineData("", true)]           // Invalid length (empty)
+        [InlineData("1234567890", true)]  // Invalid CPR number
+        [InlineData("3201010002", true)]  // Invalid CPR number, day
+        [InlineData("2213010002", true)]  // Invalid CPR number, month 13
+        [InlineData("2200010002", true)]  // Invalid CPR number, month 0
+        [InlineData("123456040", true)]   // Invalid length (too short) -1
+        [InlineData("", true)]            // Invalid length (empty)
         [InlineData("1", true)]           // Invalid length (empty)
         [InlineData("12345678900", true)] // Invalid length (too long) +1
         [InlineData("invalid_CPR", true)] // Contains non-numeric characters
@@ -385,7 +385,6 @@ namespace HMS_Tests
             };
             bool result = user.CheckUserCredentials(user);
             Assert.True(!expectedToFail == result || expectedToFail == result);
-
             //Assert.True(!expectedToFail && user.CheckValidDateOnCPR(user) || expectedToFail && !user.CheckValidDateOnCPR(user));
         }
 
