@@ -376,7 +376,7 @@ namespace HMS_Tests
 
             bool result = user.CheckValidDateOnCPR(user);
 
-            Assert.True(!expectedToFail == result || expectedToFail == !result);
+            Assert.True(!expectedToFail && result || expectedToFail && !result);
         }
 
 
