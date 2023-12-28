@@ -1,5 +1,6 @@
 ﻿using HMS.Data;
 using KEA_Final1.Controllers;
+using System.Globalization;
 
 namespace HMS.DTO
 {
@@ -23,7 +24,7 @@ namespace HMS.DTO
         public bool CheckUserCredentials(Account user)
         {
             if (user.Username.Length != 10 || 
-                user.Username != "0000000000" ||
+                user.Username == "0000000000" ||
                 string.IsNullOrEmpty(user.Password) ||
                 user.Password.Length > 30 ||
                 SqlInjectionPrevention.CheckString(user.Password) ||
@@ -46,7 +47,7 @@ namespace HMS.DTO
             stringedDate += user.Username.Substring(2, 2) + "-";
             stringedDate += "19" + user.Username.Substring(4, 2);
 
-            bool dateValid = DateTime.TryParse(stringedDate, out _);
+            bool dateValid = DateTime.TryParseExact(stringedDate, @"dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
 
             return dateValid;
         }

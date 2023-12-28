@@ -19,7 +19,7 @@ namespace HMS_Tests
             Database.SelectedDatabase = 0; // MySql
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(31); // Assuming patient with id 31 exists
 
             Assert.True(appointments.Any());
         }
@@ -31,7 +31,7 @@ namespace HMS_Tests
             Database.SelectedDatabase = 1; // MongoDB
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(31); // Assuming patient with id 31 exists
 
             Assert.True(appointments.Any());
         }
@@ -43,7 +43,7 @@ namespace HMS_Tests
             Database.SelectedDatabase = 2; // Neo4j
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1); // Assuming patient with id 1 exists
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(31); // Assuming patient with id 31 exists
 
             Assert.True(appointments.Any());
         }
@@ -83,32 +83,32 @@ namespace HMS_Tests
 
             HMS.Models.Appointment appointment = new HMS.Models.Appointment()
             {
-                PatientId = 1,
-                DoctorId = 1,
+                PatientId = 31,
+                DoctorId = 31,
                 ClinicId = 1,
                 Patient = new Patient()
                 {
-                    PatientId = 1
+                    PatientId = 31
                 },
-                DepartmentId = 1,
-                HospitalId = 1,
+                DepartmentId = 2,
+                HospitalId = 2,
                 AppointmentDate = DateTime.Now,
                 AppointmentDateEnd = DateTime.Now.AddHours(1),
                 Clinic = new Clinic()
                 {
-                    Name = "København Sundhedshus",
+                    Name = "Rigshospitalet",
                     Department = null,
                     Doctor = new Doctor()
                     {
-                        DoctorId = 1
+                        DoctorId = 31
                     }
                 },
                 Hospital = new Hospital()
                 {
                     HospitalId = 1,
-                    Name = "København Sundhedshus",
+                    Name = "Rigshospitalet",
                     Department = "ICU",
-                    DoctorId = 1
+                    DoctorId = 31
                 },
             };
 
@@ -126,25 +126,16 @@ namespace HMS_Tests
         }
 
 
-        [Fact]
-        public void GetAppointmentBySpecificId()
+        [Theory]
+        [InlineData("87", false)]
+        [InlineData("-1", true)]
+        public void GetAppointmentBySpecificId(string appointmentid, bool expectedToFail)
         {
             AppointmentService aps = new AppointmentService();
 
-            HMS.Models.Appointment appointment = aps.GetAppointmentById("1");
+            HMS.Models.Appointment appointment = aps.GetAppointmentById(appointmentid);
 
-            Assert.NotNull(appointment);
-            Assert.Equal(1, appointment.AppointmentId);
-        }
-
-        [Fact]
-        public void GetAppointmentByInvalidId()
-        {
-            AppointmentService aps = new AppointmentService();
-
-            HMS.Models.Appointment appointment = aps.GetAppointmentById("50");
-
-            Assert.Null(appointment);
+            Assert.True(appointment != null && !expectedToFail || appointment == null && expectedToFail);
         }
 
         [Fact]
@@ -152,7 +143,7 @@ namespace HMS_Tests
         {
             AppointmentService aps = new AppointmentService();
 
-            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(1);
+            List<HMS.DTO.Appointment> appointments = aps.GetAppointmentsByPatientId(31);
 
             Assert.NotNull(appointments);
             Assert.NotEmpty(appointments);
@@ -187,12 +178,11 @@ namespace HMS_Tests
         {
             AppointmentService aps = new AppointmentService();
 
-            HMS.Models.Appointment appointment = aps.GetAppointmentById("1");
+            HMS.Models.Appointment appointment = aps.GetAppointmentById("87");
 
             Assert.NotNull(appointment);
-            Assert.Equal(1, appointment.AppointmentId);
-            Assert.Equal(1, appointment.PatientId);
-            Assert.Equal(1, appointment.DoctorId);
+            Assert.Equal(31, appointment.PatientId);
+            Assert.Equal(31, appointment.DoctorId);
             Assert.Equal(1, appointment.DepartmentId);
             Assert.Equal(1, appointment.HospitalId);
         }
@@ -248,7 +238,7 @@ namespace HMS_Tests
             JournalService js = new JournalService();
             Database.SelectedDatabase = 0; // MySql
 
-            List<HMS.DTO.Journal> journals = js.GetJournals(1); // Assuming doctor with id 1 exists
+            List<HMS.DTO.Journal> journals = js.GetJournals(31); // Assuming doctor with id 1 exists
 
             Assert.True(journals.Any());
         }
@@ -282,7 +272,7 @@ namespace HMS_Tests
             // Create
             string journaltext = "Patienten er syg";
             string cpr = "1234567896"; // Assuming it exists
-            string doctorId = "1"; // Assuming it exists
+            string doctorId = "31"; // Assuming it exists
 
             bool createdSucessful = js.CreateJournal(journaltext, cpr, doctorId, out int? createdJournalId);
 
@@ -304,7 +294,7 @@ namespace HMS_Tests
         {
             PersonService ps = new PersonService();
             Database.SelectedDatabase = 0;
-            int id = 1;
+            int id = 31;
 
             HMS.DTO.Person person = ps.GetPersonData(id);
 
@@ -383,10 +373,10 @@ namespace HMS_Tests
             {
                 Username = cprNumber
             };
-            bool result = user.CheckUserCredentials(user);
-            Assert.True(!expectedToFail == result || expectedToFail == result);
 
-            //Assert.True(!expectedToFail && user.CheckValidDateOnCPR(user) || expectedToFail && !user.CheckValidDateOnCPR(user));
+            bool result = user.CheckValidDateOnCPR(user);
+
+            Assert.True(!expectedToFail && result || expectedToFail && !result);
         }
 
 
@@ -410,7 +400,6 @@ namespace HMS_Tests
             bool result = user.CheckUserCredentials(user);
             Assert.True(!expectedToFail == result || expectedToFail == result);
         }
-
         #endregion
     }
 }
