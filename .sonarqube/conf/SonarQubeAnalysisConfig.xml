@@ -7,7 +7,7 @@
   <HasBeginStepCommandLineCredentials>true</HasBeginStepCommandLineCredentials>
   <SonarQubeHostUrl>http://127.0.0.1:9000</SonarQubeHostUrl>
   <SonarQubeVersion>10.2.0.77647</SonarQubeVersion>
-  <SonarProjectKey>HMS-public</SonarProjectKey>
+  <SonarProjectKey>HMS</SonarProjectKey>
   <AdditionalConfig>
     <ConfigSetting Id="BuildUri" />
     <ConfigSetting Id="TfsUri" />
@@ -123,6 +123,8 @@
     <Property Name="sonar.updatecenter.url">https://update.sonarsource.org/update-center.properties</Property>
     <Property Name="sonar.core.id">147B411E-AYqz_hN9R0H_kA64re0D</Property>
     <Property Name="sonar.core.startTime">27-12-2023 09:10:42</Property>
+    <Property Name="sonar.coverage.exclusions">/ClientApp/**</Property>
+    <Property Name="sonar.global.exclusions">/ClientApp/**</Property>
   </ServerSettings>
   <LocalSettings>
     <Property Name="sonar.host.url">http://127.0.0.1:9000</Property>

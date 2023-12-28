@@ -7,3 +7,4 @@ C:\Users\abdi0747.NEXT\.nuget\packages\xunit.runner.visualstudio\2.4.5\build\net
 C:\Users\abdi0747.NEXT\.nuget\packages\xunit.runner.visualstudio\2.4.5\build\netcoreapp3.1\xunit.runner.reporters.netcoreapp10.dll
 C:\Users\abdi0747.NEXT\.nuget\packages\xunit.runner.visualstudio\2.4.5\build\netcoreapp3.1\xunit.runner.utility.netcoreapp10.dll
 C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS-Tests\TestResults\96b0e3b9-89d9-4061-8907-c25b425c8e94\25eeda3e-8206-44e6-aa76-1b041b3dd571.coverage
+C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS-Tests\TestResults\f321ab36-a2ba-45f3-bbde-da48343a7bc2\3103aa7a-8e6b-4d73-a85b-adc045eb3771.coverage

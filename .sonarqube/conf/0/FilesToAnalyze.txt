@@ -51,6 +51,9 @@ C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientA
 C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\.gitignore
 C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\aspnetcore-https.js
 C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\aspnetcore-react.js
+C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\cypress.config.ts
+C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\Cypress\e2e\tests.cy.js
+C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\Cypress\support\e2e.js
 C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\package-lock.json
 C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\package.json
 C:\Users\abdi0747.NEXT\Desktop\Softwareudvikling\Database\HMS-public\HMS\ClientApp\public\favicon.ico
