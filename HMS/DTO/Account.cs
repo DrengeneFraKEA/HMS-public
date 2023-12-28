@@ -1,5 +1,6 @@
 ﻿using HMS.Data;
 using KEA_Final1.Controllers;
+using System.Globalization;
 
 namespace HMS.DTO
 {
@@ -46,7 +47,7 @@ namespace HMS.DTO
             stringedDate += user.Username.Substring(2, 2) + "-";
             stringedDate += "19" + user.Username.Substring(4, 2);
 
-            bool dateValid = DateTime.TryParse(stringedDate, out _);
+            bool dateValid = DateTime.TryParseExact(stringedDate, @"dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
 
             return dateValid;
         }
