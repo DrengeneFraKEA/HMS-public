@@ -30,9 +30,9 @@ namespace HMS.DTO
                 SqlInjectionPrevention.CheckString(user.Password) ||
                 SqlInjectionPrevention.CheckString(user.Username) ||
                 !CheckValidDateOnCPR(user))
-                return false;
-            else
                 return true;
+            else
+                return false;
         }
 
 
