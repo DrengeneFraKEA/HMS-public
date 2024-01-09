@@ -30,7 +30,7 @@ namespace KEA_Final1.Controllers
 
             BrowserStorage bs = null;
 
-            using (MySqlCommand cmd = new MySqlCommand()) 
+            using (MySqlCommand cmd = new MySqlCommand())
             {
                 Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
                 mysql.Db.Open();
@@ -54,7 +54,16 @@ namespace KEA_Final1.Controllers
 
             if (bs != null)
                 return JsonSerializer.Serialize(bs);
-            
+
+            // Hack to get around mysql being down.
+            //BrowserStorage bs = new BrowserStorage()
+            //{
+            //    UserId = 31,
+            //    Role = "doctor",
+            //    Token = jwtTokenGenerator.GenerateToken(user.Username, "doctor")
+            //};
+            //return JsonSerializer.Serialize(bs);
+
             return string.Empty;
         }
 
