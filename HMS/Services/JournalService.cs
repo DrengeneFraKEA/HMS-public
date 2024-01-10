@@ -1,8 +1,10 @@
 ﻿using HMS.Data;
 using HMS.DTO;
 using HMS.Models;
+using MongoDB.Driver;
 using MySqlConnector;
 using Neo4j.Driver;
+using System.Globalization;
 using System.Runtime.ConstrainedExecution;
 using System.Text.Json;
 
@@ -39,8 +41,53 @@ namespace HMS.Services
                     }
                     break;
                 case 1:
+                    // MongoDB
+                    Database.MongoDbContext mdbc = new Database.MongoDbContext();
+                    MongoClient mc = new MongoClient(mdbc.ConnectionString);
+
+                    var database = mc.GetDatabase("HMS");
+                    var journalCollection = database.GetCollection<Models.Journal>("journals");
+
+                    var filter = Builders<Models.Journal>.Filter.Eq(a => a.DoctorId, doctorid);
+                    var documents = journalCollection.Find(filter).ToList();
+
+                    var result = documents.Select(journal => new DTO.Journal
+                    {
+                        Id = journal.JournalId,
+                        Note = journal.JournalNote,
+                        CreatedOn = journal.CreatedOn,
+                        ModifiedOn = journal.ModifiedOn,
+                        CPR = journal.CPR
+                    }).ToList();
+
+                    foreach (var element in result) journals.Add(element);
                     break;
                 case 2:
+                    // Hent med graphql
+                    Database.GraphQlContext gdbc = new Database.GraphQlContext();
+                    var session = gdbc.Neo4jDriver.Session();
+                    var allJournals = session.ExecuteRead(tx =>
+                    {
+                        var res = tx.Run("match (j:Journal {doctor_id: " + doctorid + "}) return j");
+
+                        journals = res.Select(record =>
+                        {
+                            var node = record["j"].As<INode>();
+                            var props = node.Properties;
+                            IFormatProvider format = new CultureInfo("da-DK");
+                            return new DTO.Journal
+                            {
+                                Id = int.Parse(props["journal_id"].ToString()),
+                                Note = props["journalnotes"].ToString(),
+                                CreatedOn = DateTime.Parse(props["created_on"].ToString(), format),
+                                ModifiedOn = DateTime.Parse(props["modified_on"].ToString(), format),
+                                CPR = props["cpr"].ToString()
+                            };
+
+                        }).ToList();
+
+                        return journals;
+                    });
                     break;
             }
 
@@ -74,7 +121,23 @@ namespace HMS.Services
             mysql.Db.Close();
 
             // MongoDB
-            // WIP..
+            Database.MongoDbContext mdbc = new Database.MongoDbContext();
+            MongoClient mc = new MongoClient(mdbc.ConnectionString);
+
+            var database = mc.GetDatabase("HMS");
+            var journalCollection = database.GetCollection<Models.Journal>("journals");
+
+            Models.Journal journal = new Models.Journal()
+            {
+                JournalId = lastInsertedId,
+                DoctorId = int.Parse(doctorid),
+                JournalNote = journaltext,
+                CreatedOn = DateTime.Parse(now),
+                ModifiedOn = DateTime.Parse(now),
+                CPR = cpr
+            };
+
+            journalCollection.InsertOne(journal);
 
             // GraphQL
             Database.GraphQlContext gdbc = new Database.GraphQlContext();
@@ -84,7 +147,7 @@ namespace HMS.Services
             {
                 var res = tx.Run($@"CREATE (j:Journal {{ 
                     journal_id: {lastInsertedId}, 
-                    doctor_id: '{doctorid}', 
+                    doctor_id: {doctorid}, 
                     journalnotes: '{journaltext}', 
                     created_on: '{now}',
                     modified_on: '{now}',
@@ -115,7 +178,16 @@ namespace HMS.Services
             mysql.Db.Close();
 
             // MongoDB
+            Database.MongoDbContext mdbc = new Database.MongoDbContext();
+            MongoClient mc = new MongoClient(mdbc.ConnectionString);
 
+            var database = mc.GetDatabase("HMS");
+            var journalCollection = database.GetCollection<Models.Journal>("journals");
+            int jid = int.Parse(journalid);
+
+            var filter = Builders<Models.Journal>.Filter.Eq(j => j.JournalId, jid);
+
+            journalCollection.DeleteOne(filter);
 
             // GraphQL
             Database.GraphQlContext gdbc = new Database.GraphQlContext();
@@ -149,7 +221,18 @@ namespace HMS.Services
             mysql.Db.Close();
 
             // MongoDB
+            Database.MongoDbContext mdbc = new Database.MongoDbContext();
+            MongoClient mc = new MongoClient(mdbc.ConnectionString);
+            var database = mc.GetDatabase("HMS");
+            var journalCollection = database.GetCollection<Models.Journal>("journals");
+            int jid = int.Parse(journalid);
 
+            var filter = Builders<Models.Journal>.Filter.Eq(j => j.JournalId, jid);
+            var update = Builders<Models.Journal>.Update
+                .Set(j => j.JournalNote, newjournaltext)
+                .Set(j => j.ModifiedOn, dt);
+
+            journalCollection.UpdateOne(filter, update);
 
             // GraphQL
             Database.GraphQlContext gdbc = new Database.GraphQlContext();
