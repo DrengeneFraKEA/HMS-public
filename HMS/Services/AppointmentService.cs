@@ -53,7 +53,7 @@ namespace HMS.Services
                     Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
 
                     mysql.Db.Open();
-                    var command = new MySqlCommand("SELECT * FROM hms.appointment a JOIN hospital h on h.id = a.hospital_id WHERE patient_id = @patientId;", mysql.Db);
+                    var command = new MySqlCommand("SELECT * FROM hms3.appointment a JOIN hospital h on h.id = a.hospital_id WHERE patient_id = @patientId;", mysql.Db);
                     command.Parameters.AddWithValue("@patientId", patientId);
                     var reader = command.ExecuteReader();
 
@@ -259,7 +259,7 @@ namespace HMS.Services
             Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.FullAdmin);
 
             mysql.Db.Open();
-            var command = new MySqlCommand("DELETE FROM hms.appointment WHERE id = @appointmentId;", mysql.Db);
+            var command = new MySqlCommand("DELETE FROM hms3.appointment WHERE id = @appointmentId;", mysql.Db);
             command.Parameters.AddWithValue("@appointmentId", appointmentId);
 
             command.ExecuteNonQuery();

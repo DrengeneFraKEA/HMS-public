@@ -49,25 +49,17 @@ namespace HMS.Services
             if (!legit) return false;
 
             bool exists = false;
+            
+            Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
 
-            switch (Database.SelectedDatabase)
-            {
-                case 0:
-                    Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
+            mysql.Db.Open();
 
-                    mysql.Db.Open();
+            var command = new MySqlCommand($"SELECT * FROM personData WHERE cpr = {cpr};", mysql.Db);
+            var reader = command.ExecuteReader();
+            exists = reader.HasRows;
 
-                    var command = new MySqlCommand($"SELECT * FROM personData WHERE cpr = {cpr};", mysql.Db);
-                    var reader = command.ExecuteReader();
-                    exists = reader.HasRows;
-
-                    mysql.Db.Close();
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-            }
+            mysql.Db.Close();
+            
 
             return exists;
         }
