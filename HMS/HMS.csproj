@@ -35,8 +35,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="opt\render\project\src\package-lock.json" />
+    <Content Remove="opt\render\project\src\package.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="ClientApp\Cypress\e2e\" />
     <Folder Include="ClientApp\Cypress\support\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="opt\render\project\src\package-lock.json" />
+    <None Include="opt\render\project\src\package.json" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
