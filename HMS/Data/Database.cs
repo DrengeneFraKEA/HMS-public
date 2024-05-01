@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using MySqlConnector;
 using Neo4j.Driver;
+using System.Data.Common;
 
 namespace HMS.Data
 {
@@ -19,31 +20,39 @@ namespace HMS.Data
         public class MySQLContext
         {
             public MySqlConnection Db { get; set; }
+            public bool UseLocalHost = true;
+            public string DbName = "hms3";
             public MySQLContext(MySqlAccountType type) 
             {
                 IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
-                
+                string cs = "MySql";
+                if (UseLocalHost) 
+                {
+                    cs = "MySqlLocalHost";
+                    this.DbName = "hms";
+                }
+
                 switch (type)
                 {
                     case MySqlAccountType.ReadOnly:
-                        var mysql_read = Environment.GetEnvironmentVariable("MYSQL_READ");
-                        this.Db = new MySqlConnection(mysql_read);
-                        if (mysql_read.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection("MySql:MySqlRead").Value);
+                        var mysql_read = Environment.GetEnvironmentVariable($"MYSQL_READ");
+                        if (mysql_read.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection($"{cs}:MySqlRead").Value);
+                        else this.Db = new MySqlConnection(mysql_read);
                         break;
                     case MySqlAccountType.WriteOnly:
-                        var mysql_write = Environment.GetEnvironmentVariable("MYSQL_WRITE");
-                        this.Db = new MySqlConnection(mysql_write);
-                        if (mysql_write.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection("MySql:MySqlWrite").Value);
+                        var mysql_write = Environment.GetEnvironmentVariable($"MYSQL_WRITE");
+                        if (mysql_write.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection($"{cs}:MySqlWrite").Value);
+                        else this.Db = new MySqlConnection(mysql_write);
                         break;
                     case MySqlAccountType.ReadWrite:
-                        var mysql_readwrite = Environment.GetEnvironmentVariable("MYSQL_READWRITE");
-                        this.Db = new MySqlConnection(mysql_readwrite);
-                        if (mysql_readwrite.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection("MySql:MySqlReadWrite").Value);
+                        var mysql_readwrite = Environment.GetEnvironmentVariable($"MYSQL_READWRITE");
+                        if (mysql_readwrite.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection($"{cs}:MySqlReadWrite").Value);
+                        else this.Db = new MySqlConnection(mysql_readwrite);
                         break;
                     case MySqlAccountType.FullAdmin:
-                        var mysql_admin = Environment.GetEnvironmentVariable("MYSQL_ADMIN");
-                        this.Db = new MySqlConnection(mysql_admin);
-                        if (mysql_admin.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection("MySql:MySqlAdmin").Value);
+                        var mysql_admin = Environment.GetEnvironmentVariable($"MYSQL_ADMIN");
+                        if (mysql_admin.IsNullOrEmpty()) this.Db = new MySqlConnection(config.GetSection($"{cs}:MySqlAdmin").Value);
+                        else this.Db = new MySqlConnection(mysql_admin);
                         break;
                 }
             }
