@@ -9,6 +9,7 @@ using System.Text.Json;
 using MongoDB.Bson.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using HMS.DTO;
 
 namespace HMS.Services;
 
@@ -22,7 +23,7 @@ public class DrugService
             case 0:
                 // Hent med mysql..
 
-                var drugs = new List<Drug>();
+                var drugs = new List<Models.Drug>();
                 Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadOnly);
 
                 mysql.Db.Open();
@@ -32,7 +33,7 @@ public class DrugService
 
                 while (reader.Read())
                 {
-                    var drug = new Drug()
+                    var drug = new Models.Drug()
                     {
                         DrugId = reader.GetInt32("id"),
                         Name = reader.GetString("name"),
@@ -126,6 +127,26 @@ public class DrugService
         mysql.Db.Close();
 
         return JsonSerializer.Serialize(drug_prescriptions);
+    }
+
+    public bool PrescribeDrug(PrescriptionDTO prescription) 
+    {
+        bool validEntry = prescription.CPR != string.Empty && prescription.drug != null && prescription.CPR.Length == 10 && int.TryParse(prescription.CPR, out _) == true;
+        if (!validEntry) return false;
+
+        RabbitMQPublisher rmq = new RabbitMQPublisher("localhost", "drug_prescription");
+        string message = JsonSerializer.Serialize(prescription);
+
+        try 
+        {
+            rmq.PublishMessage(message);
+        }
+        catch 
+        {
+            return false;
+        }
+
+        return true;
     }
 }
 

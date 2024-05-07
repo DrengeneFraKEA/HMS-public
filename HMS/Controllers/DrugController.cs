@@ -1,12 +1,12 @@
 using HMS.Data;
 using Microsoft.AspNetCore.Mvc;
 using HMS.Models;
-
 using MySqlConnector;
 using Microsoft.Extensions.Options;
 using HMS.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
+using HMS.DTO;
 
 namespace HMS.Controllers;
 
@@ -37,5 +37,12 @@ public class DrugController : ControllerBase
     public string GetDrugsWithPrescriptions()
     {
         return drugService.GetDrugsWithPrescriptions();
+    }
+
+    [HttpPost]
+    [Route("prescribe")]
+    public bool PrescribeDrug([FromBody] PrescriptionDTO prescription)
+    {
+        return drugService.PrescribeDrug(prescription);
     }
 }

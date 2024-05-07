@@ -12,6 +12,8 @@ export class Prescriptions extends Component {
             searchText: '',
             searchResults: [],
             prescriptions: [],
+            currentCPR: '', // Added to store the current CPR value
+            prescriptionStatus: '' // Added to store the prescription status
         };
     }
 
@@ -47,22 +49,80 @@ export class Prescriptions extends Component {
     };
 
     handlePrescribeButtonClick = (drugId) => {
+        // Find the drug in searchResults based on its ID
+        const { searchResults } = this.state;
+        const selectedDrug = searchResults.find(drug => drug.Id === drugId);
 
-        const patientInfo = {
-            patientId: 123,
-            name: 'John Doe',
-            socialNumber: '123-45-6789',
-        };
+        // Log the details of the selected drug
+        console.log("User clicked on drug:", selectedDrug);
 
-        // Update prescriptions state with the new prescription
-        this.setState(prevState => ({
-            prescriptions: [...prevState.prescriptions, { drugId, ...patientInfo }],
-        }));
+        // Check if a prescription with CPR input already exists
+        const { prescriptions } = this.state;
+        const existingPrescriptionIndex = prescriptions.findIndex(prescription => prescription.cprInputOpen);
 
+        // If an existing prescription is found, clear its CPR input field and update the selected drug
+        if (existingPrescriptionIndex !== -1) {
+            const updatedPrescriptions = [...prescriptions];
+            updatedPrescriptions[existingPrescriptionIndex] = {
+                ...updatedPrescriptions[existingPrescriptionIndex],
+                selectedDrugId: drugId,
+                cpr: '', // Clear the CPR input field
+            };
+
+            // Update the state with the modified prescription
+            this.setState({ prescriptions: updatedPrescriptions });
+        } else {
+            // Otherwise, add a new prescription
+            const dummyPrescription = {
+                cprInputOpen: true,
+                selectedDrugId: drugId // Store the selected drug ID in state
+            };
+
+            // Add the dummy prescription to the state
+            this.setState(prevState => ({
+                prescriptions: [...prevState.prescriptions, dummyPrescription]
+            }));
+        }
+    };
+
+    handleCPRInputChange = (index, e) => {
+        const { prescriptions } = this.state;
+        const updatedPrescriptions = [...prescriptions];
+        updatedPrescriptions[index].cpr = e.target.value;
+        this.setState({
+            prescriptions: updatedPrescriptions,
+            currentCPR: e.target.value, // Update the current CPR value in state
+        });
+    };
+
+    SendPrescriptionButtonClicked = async () => {
+        const { currentCPR, searchResults } = this.state;
+        console.log("CPR from previous prescription:", currentCPR);
+
+        const selectedDrug = searchResults.find(drug => drug.Id === this.state.prescriptions[this.state.prescriptions.length - 1].selectedDrugId);
+        console.log("Current selected drug:", selectedDrug);
+
+        try {
+            const response = await axios.post("drug/prescribe", {
+                cpr: currentCPR,
+                drug: selectedDrug
+            });
+
+            console.log(response)
+
+            if (response.data === true) {
+                this.setState({ prescriptionStatus: 'Recept modtaget!' });
+            } else {
+                this.setState({ prescriptionStatus: 'Noget gik galt!' });
+            }
+        } catch (error) {
+            console.log("Error:", error);
+            this.setState({ prescriptionStatus: 'Error occurred while processing prescription' });
+        }
     };
 
     render() {
-        const { searchText, searchResults, prescriptions } = this.state;
+        const { searchText, searchResults, prescriptions, prescriptionStatus } = this.state;
 
         return (
             <>
@@ -100,19 +160,27 @@ export class Prescriptions extends Component {
 
                     {prescriptions.length > 0 && (
                         <div className="prescriptions-box">
-                            <h2>Prescriptions</h2>
+                            <h2>Indtast CPR</h2>
                             <div className="prescriptions-container">
                                 {prescriptions.map((prescription, index) => (
                                     <div key={index} className="prescription-item">
-                                        <div className="column">Patient ID: {prescription.patientId}</div>
-                                        <div className="column">Navn: {prescription.name}</div>
-                                        <div className="column">CPR: {prescription.socialNumber}</div>
-                                        <button className="prescribe-button">
-                                            Prescribe
+                                        <input
+                                            type="text"
+                                            value={prescription.cpr || ''}
+                                            onChange={(e) => this.handleCPRInputChange(index, e)}
+                                            className="cpr-input"
+                                            placeholder="CPR"
+                                        />
+                                        <button
+                                            onClick={this.SendPrescriptionButtonClicked}
+                                            className="kvitter-button">
+                                            Kvitter
                                         </button>
                                     </div>
                                 ))}
                             </div>
+                            {/* Display prescription status */}
+                            <div>{prescriptionStatus}</div>
                         </div>
                     )}
                 </div>
