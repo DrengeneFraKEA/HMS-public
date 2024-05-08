@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
+import { v4 as uuidv4 } from 'uuid';
 import '../styling/navbar.css';
 
 export class Rating extends Component {
@@ -9,6 +10,14 @@ export class Rating extends Component {
 
         this.state = {
             ratings: [],
+            newRating: {
+                rating: { id: '' },
+                doctorName: '',
+                title: '',
+                text: '',
+                score: '',
+                uuid: ''
+            }
         };
     }
 
@@ -28,14 +37,75 @@ export class Rating extends Component {
         }
     }
 
+    handleInputChange = (e) => {
+        this.setState({
+            newRating: {
+                ...this.state.newRating,
+                [e.target.name]: e.target.value
+            }
+        });
+    }
+
+    handleSubmit = async (ratingId) => {
+        try {
+
+            const newRatingWithUUID = {
+                ...this.state.newRating,
+                uuid: uuidv4(),
+                rating: { id: ratingId }
+            };
+            console.log("newRatingWithUUID: ", newRatingWithUUID)
+            const response = await axios.post("http://localhost:8080/api/rating/create", newRatingWithUUID);
+            console.log('Rating created: ', response.data);
+
+            this.setState({
+                newRating: {
+                    rating: { id: '' },
+                    doctorName: '',
+                    title: '',
+                    text: '',
+                    score: '',
+                    uuid: ''
+                }
+            });
+            this.fetchRatings();
+        } catch (error) {
+            console.error('Error creating rating:', error);
+        }
+    }
+
+    handleDeleteRating = async (ratingId) => {
+        try {
+            await axios.post(`http://localhost:8080/api/rating/${ratingId}/delete`);
+            this.fetchRatings();
+        } catch (error) {
+            console.error('Error deleting rating:', error);
+        }
+    }
+
     render() {
-        const { ratings } = this.state;
+        const { ratings, newRating } = this.state;
 
         return (
             <>
                 <Navbar />
                 <div className="journal-container">
                     <h2>Ratings</h2>
+                    <form onSubmit={this.handleSubmit}>
+                        <div>
+                            <input type="text" name="doctorName" value={newRating.doctorName} onChange={this.handleInputChange} placeholder="Indtast lægens navn" />
+                        </div>
+                        <div>
+                            <input type="text" name="title" value={newRating.title} onChange={this.handleInputChange} placeholder="Skriv en titel" />
+                        </div>
+                        <div>
+                            <textarea name="text" value={newRating.text} onChange={this.handleInputChange} placeholder="Skriv en kommentar" />
+                        </div>
+                        <div>
+                            <input type="text" name="score" value={newRating.score} onChange={this.handleInputChange} placeholder="Indtast en score" />
+                        </div>
+                        <button type="submit">Submit Rating</button>
+                    </form>
                     <ul>
                         {ratings.map((rating) => (
                             <li key={rating.id}>
@@ -43,8 +113,10 @@ export class Rating extends Component {
                                 <div className="journal-date">Text: {rating.text}</div>
                                 <div className="journal-date">Score: {rating.score}</div>
                                 <div className="journal-date">Date: {rating.modifiedDate}</div>
-                                <div className="journal-date">Patient ID: {rating.patientId}</div>
-                                <div className="journal-date">Doctor ID: {rating.doctorId}</div>
+                                <div className="journal-date">Doctor Name: {rating.doctorName}</div>
+                                <div className="journal-date">Rating ID: {rating.rating.id}</div>
+                                <button onClick={() => this.handleSubmit(rating.rating.id)}>Update</button>
+                                <button onClick={() => this.handleDeleteRating(rating.rating.id)}>Delete</button>
                             </li>
                         ))}
                     </ul>
