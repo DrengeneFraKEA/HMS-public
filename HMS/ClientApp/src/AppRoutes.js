@@ -3,6 +3,7 @@ import { Login } from "./components/Login";
 import { Appointments } from "./components/Appointments";
 import { Prescriptions } from "./components/Prescriptions";
 import { Journal } from "./components/Journal";
+import { Rating } from "./components/Ratings";
 
 const AppRoutes = [
     {
@@ -24,6 +25,10 @@ const AppRoutes = [
     {
         path: '/main',
         element: <Main />
+    },
+    {
+        path: '/ratings',
+        element: <Rating />
     }
 ];
 
