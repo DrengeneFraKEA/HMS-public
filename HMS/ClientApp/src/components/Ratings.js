@@ -27,7 +27,7 @@ export class Rating extends Component {
 
     fetchRatings = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/rating");
+            const response = await axios.get("http://localhost:8090/api/rating");
             this.setState({
                 ratings: response.data,
             });
@@ -46,17 +46,20 @@ export class Rating extends Component {
         });
     }
 
-    handleSubmit = async (ratingId) => {
+    handleSubmit = async (e) => {
+        e.preventDefault();
         try {
 
+            const { doctorName, title, text, score } = this.state.newRating;
+
             const newRatingWithUUID = {
-                ...this.state.newRating,
                 uuid: uuidv4(),
-                rating: { id: ratingId }
+                doctorName,
+                title,
+                text,
+                score
             };
-            console.log("newRatingWithUUID: ", newRatingWithUUID)
-            const response = await axios.post("http://localhost:8080/api/rating/create", newRatingWithUUID);
-            console.log('Rating created: ', response.data);
+            await axios.post("http://localhost:8090/api/rating/create", newRatingWithUUID);
 
             this.setState({
                 newRating: {
@@ -74,9 +77,41 @@ export class Rating extends Component {
         }
     }
 
+    handleUpdate = async (ratingId) => {
+        try {
+            const { doctorName, title, text, score } = this.state.newRating;
+
+            const newRatingWithUUID = {
+                uuid: uuidv4(),
+                rating: { id: ratingId },
+                doctorName,
+                title,
+                text,
+                score
+            };
+            await axios.post("http://localhost:8090/api/rating/create", newRatingWithUUID);
+
+            this.setState({
+                newRating: {
+                    rating: { id: '' },
+                    doctorName: '',
+                    title: '',
+                    text: '',
+                    score: '',
+                    uuid: ''
+                }
+            });
+            this.fetchRatings();
+
+
+        } catch (error) {
+            console.error('Error updating rating:', error);
+        }
+    }
+
     handleDeleteRating = async (ratingId) => {
         try {
-            await axios.post(`http://localhost:8080/api/rating/${ratingId}/delete`);
+            await axios.post(`http://localhost:8090/api/rating/${ratingId}/delete`);
             this.fetchRatings();
         } catch (error) {
             console.error('Error deleting rating:', error);
@@ -115,7 +150,7 @@ export class Rating extends Component {
                                 <div className="journal-date">Date: {rating.modifiedDate}</div>
                                 <div className="journal-date">Doctor Name: {rating.doctorName}</div>
                                 <div className="journal-date">Rating ID: {rating.rating.id}</div>
-                                <button onClick={() => this.handleSubmit(rating.rating.id)}>Update</button>
+                                <button onClick={() => this.handleUpdate(rating.rating.id)}>Update</button>
                                 <button onClick={() => this.handleDeleteRating(rating.rating.id)}>Delete</button>
                             </li>
                         ))}
