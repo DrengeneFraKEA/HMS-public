@@ -1,10 +1,12 @@
 ﻿using HMS.Data;
+using HMS.DTO;
 using HMS.Models;
 using MongoDB.Driver;
 using MySqlConnector;
 using Neo4j.Driver;
 using System.Data;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 
 namespace HMS.Services
@@ -125,41 +127,34 @@ namespace HMS.Services
             return appointments;
         }
 
-        public bool CreateAppointment(Models.Appointment appointment, out int? id)
+        public bool CreateAppointment(int patientid, int doctorid, int departmentid, int hospitalid, string start, string end, out int? lastId)
         {
-            if (appointment == null) 
-            {
-                id = null;
-                return false;
-            }
-
             // MySql
             Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadWrite);
+            start = start.Replace('T', ' ');
+            end = end.Replace('T', ' ');
+
+            // Add seconds (00) to the input strings
+            start += ":00";
+            end += ":00";
+
+            DateTime appointmentDate = DateTime.ParseExact(start, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime appointmentDateEnd = DateTime.ParseExact(end, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
 
             mysql.Db.Open();
-            var command = new MySqlCommand("CreateAppointment", mysql.Db);
-            command.CommandType = CommandType.StoredProcedure;
 
-            command.Parameters.AddWithValue("a_appointment_id", appointment.AppointmentId);
-            command.Parameters.AddWithValue("a_patient_id", appointment.PatientId);
-            command.Parameters.AddWithValue("a_doctor_id", appointment.DoctorId);
-            command.Parameters.AddWithValue("a_department_id", appointment.DepartmentId);
-            command.Parameters.AddWithValue("a_hospital_id", appointment.HospitalId);
-            command.Parameters.AddWithValue("a_appointment_date", appointment.AppointmentDate);
-            command.Parameters.AddWithValue("a_appointment_date_end", appointment.AppointmentDateEnd);
-
-            var lastIdParameter = new MySqlParameter("last_id", MySqlDbType.Int32);
-            lastIdParameter.Direction = ParameterDirection.Output;
-            command.Parameters.Add(lastIdParameter);
+            var command = new MySqlCommand($"INSERT INTO appointment (patient_id, doctor_id, department_id, hospital_id, appointment_date, appointment_date_end) " +
+                $"VALUES ('{patientid}', '{doctorid}', '{departmentid}', '{hospitalid}', '{appointmentDate:yyyy-MM-dd HH:mm:ss}', '{appointmentDateEnd:yyyy-MM-dd HH:mm:ss}')", mysql.Db);
 
             command.ExecuteReader();
 
-            id = Convert.ToInt32(command.Parameters["last_id"].Value);
+            int lastInsertedId = int.Parse(command.LastInsertedId.ToString());
+            lastId = lastInsertedId;
 
-            appointment.AppointmentId = id.Value;
-            
             mysql.Db.Close();
 
+            /*
             // MongoDB
             Database.MongoDbContext mdbc = new Database.MongoDbContext();
             MongoClient mc = new MongoClient(mdbc.ConnectionString);
@@ -189,9 +184,83 @@ namespace HMS.Services
 
                 return res;
             });
+            */
 
             return true;
         }
+
+        public bool SendAppointmentInformation(string cpr, string place, string start, string end)
+        {
+            start = start.Replace('T', ' ');
+            end = end.Replace('T', ' ');
+
+            start += ":00";
+            end += ":00";
+
+            DateTime appointmentDate = DateTime.ParseExact(start, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime appointmentDateEnd = DateTime.ParseExact(end, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+            Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadWrite);
+            mysql.Db.Open();
+
+            var command = new MySqlCommand("SELECT * FROM hms3.persondata WHERE cpr = @cpr;", mysql.Db);
+            command.Parameters.AddWithValue("@cpr", cpr);
+
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.HasRows)
+                {
+                    reader.Read();
+
+                    string firstName = reader.GetString("first_name");
+                    string lastName = reader.GetString("last_name");
+                    string email = reader.GetString("email");
+
+                    reader.Close();
+
+                    mysql.Db.Close();
+
+                    var requestData = new
+                    {
+                        firstName,
+                        lastName,
+                        place,
+                        appointmentDate,
+                        appointmentDateEnd,
+                        email
+                    };
+
+                    var jsonData = JsonSerializer.Serialize(requestData);
+
+                    using (var httpClient = new HttpClient())
+                    {
+                        var url = "http://localhost:8080/send-email"; // Replace with the URL of your Node.js server
+                        var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                        var responseTask = httpClient.PostAsync(url, content);
+                        responseTask.Wait(); // Wait for the response
+
+                        var response = responseTask.Result;
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No person found with the provided CPR number.");
+                    mysql.Db.Close();
+                    return false;
+                }
+            }
+        }
+
 
         public bool UpdateAppointment(Models.Appointment appointment)
         {
