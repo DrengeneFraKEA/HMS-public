@@ -57,6 +57,9 @@ export class Main extends Component {
                                 <strong>Efternavn:</strong> {userData.Lastname}
                             </div>
                             <div className="info-item">
+                                <strong>Email:</strong> {userData.Email}
+                            </div>
+                            <div className="info-item">
                                 <strong>CPR:</strong> {userData.CPR}
                             </div>
                             <div className="info-item">

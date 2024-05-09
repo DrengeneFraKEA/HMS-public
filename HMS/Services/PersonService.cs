@@ -26,6 +26,7 @@ namespace HMS.Services
                         {
                             Firstname = reader.GetString("first_name"),
                             Lastname = reader.GetString("last_name"),
+                            Email = reader.GetString("email"),
                             CPR = reader.GetString("cpr"),
                             Address = reader.GetString("address"),
                             Phonenumber = reader.GetInt32("contact_number")

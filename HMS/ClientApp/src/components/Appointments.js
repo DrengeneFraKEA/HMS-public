@@ -10,7 +10,14 @@ export class Appointments extends Component {
         super(props);
         this.state = {
             appointments: [],
-            editingAppointments: {}
+            editingAppointments: {},
+            newAppointment: {
+                place: '',
+                start: '',
+                end: ''
+            },
+            searchQuery: '',
+            searchResult: null
         };
     }
 
@@ -114,13 +121,88 @@ export class Appointments extends Component {
         }
     };
 
+    handleSearchClick = async () => {
+        const { searchQuery } = this.state;
+        var request = "person/person/" + searchQuery;
+
+        try {
+            const response = await axios.get(request, {
+                headers: { Authorization: localStorage.getItem('token') },
+            });
+
+            this.setState({ searchResult: response.data });
+
+        } catch (error) {
+            console.error('Error deleting journal:', error);
+        }
+    };
+
+    handleAddAppointment = async () => {
+        let { newAppointment } = this.state;
+
+        // Additional information
+        const userData = {
+            userid: localStorage.getItem('userid')
+        };
+        const doctor_id = 31;
+        const department_id = 1;
+        const hospital_id = 1;
+        // Merge additional info
+        let updatedAppointment = {
+            ...newAppointment,
+            patient_id: userData.userid,
+            doctor_id: doctor_id,
+            department_id: department_id,
+            hospital_id: hospital_id
+        };
+
+        var request = "appointment/patientid/" + updatedAppointment.patient_id +
+            "/doctorid/" + updatedAppointment.doctor_id +
+            "/departmentid/" + updatedAppointment.department_id +
+            "/hospitalid/" + updatedAppointment.hospital_id +
+            "/start/" + updatedAppointment.start +
+            "/end/" + updatedAppointment.end;
+
+        try {
+                await axios.get(request, {
+                    headers: { Authorization: localStorage.getItem('token') }
+            });
+
+            this.handleSendDataForSMTP();
+            this.fetchAppointments();
+
+        } catch (error) {
+            console.log('Error adding new appointment: ', error);
+        }
+    };
+
+    handleSendDataForSMTP = async () => {
+        const { newAppointment } = this.state;
+        const { searchQuery } = this.state;
+
+        var request = "appointment/cpr/" + searchQuery +
+        "/place/" + newAppointment.place +
+        "/start/" + newAppointment.start +
+        "/end/" + newAppointment.end; 
+
+        try {
+            await axios.get(request, {
+                headers: { Authorization: localStorage.getItem('token') }
+            });
+
+
+        } catch (error) {
+            console.log('Error sending new appointment information: ', error);
+        }
+    }
+
     getAppointmentById = (appointmentId) => {
         const { appointments } = this.state;
         return appointments.find((appointment) => appointment.Id === appointmentId);
     };
 
     render() {
-        const { appointments, editingAppointments } = this.state;
+        const { appointments, editingAppointments, newAppointment, searchQuery, searchResult } = this.state;
 
         return (
             <>
@@ -133,6 +215,51 @@ export class Appointments extends Component {
                             <div className="column">Start tidspunkt</div>
                             <div className="column">Slut tidspunkt</div>
                             <div className="column">Handlinger</div>
+                        </div>
+                        <div className="appointment-item">
+                            <div className="column">
+                                <input
+                                    type="text"
+                                    value={newAppointment.place}
+                                    onChange={(e) => this.setState({ newAppointment: { ...newAppointment, place: e.target.value } })}
+                                    placeholder="Sted"
+                                />
+                            </div>
+                            <div className="column">
+                                <input
+                                    type="datetime-local"
+                                    value={newAppointment.start}
+                                    onChange={(e) => this.setState({ newAppointment: { ...newAppointment, start: e.target.value } })}
+                                />
+                            </div>
+                            <div className="column">
+                                <input
+                                    type="datetime-local"
+                                    value={newAppointment.end}
+                                    onChange={(e) => this.setState({ newAppointment: { ...newAppointment, end: e.target.value } })}
+                                />
+                            </div>
+                            <div className="column">
+                                <input
+                                    type="text"
+                                    placeholder="Indtast cpr"
+                                    value={searchQuery}
+                                    onChange={(e) => this.setState({ searchQuery: e.target.value })}
+                                />
+
+                                {searchResult !== null && (
+                                    <label className={searchResult ? 'success-label' : 'error-label'}>
+                                        {searchResult === 0
+                                            ? ''
+                                            : searchResult === true
+                                                ? 'Patient tilknyttet'
+                                                : 'Patient findes ikke'}
+                                    </label>
+                                )}
+                                <div style={{ marginTop: '10px' }}></div>
+                                <button onClick={this.handleSearchClick}>Tilknyt patient</button>
+                                <button onClick={this.handleAddAppointment}>Tilføj</button>
+                            </div>
                         </div>
                         {appointments.map(appointment => (
                             <div key={appointment.Id} className="appointment-item">

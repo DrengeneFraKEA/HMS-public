@@ -29,9 +29,9 @@ public class AppointmentController : ControllerBase
     {
         return JsonSerializer.Serialize(appointmentService.GetAppointmentsByPatientId(patientId));
     }
-
-
-    [HttpPost]
+/*
+    [Authorize]
+    [HttpGet]
     public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
     {
         try
@@ -43,6 +43,44 @@ public class AppointmentController : ControllerBase
         {
             return BadRequest("Failed to create appointment "+ex.Message);
         }
+    }
+
+    [Authorize]
+    [HttpGet("patientid/{patientid}/doctorid/{doctorid}/departmentid/{departmentid}/hospitalid/{hospitalid}/appointmentdate/{appointmentdate}/appointmentdateend/{appointmentdateend}")]
+    public IActionResult CreateAppointment(int patientid, int doctorid, int departmentid, int hospitalid, string start, string end)
+    {
+        try
+        {
+            Models.Appointment appointment = new Models.Appointment();
+            appointment.PatientId = patientid;
+            appointment.DoctorId = doctorid;
+            appointment.DepartmentId = departmentid;
+            appointment.HospitalId = hospitalid;
+            appointment.AppointmentDate = DateTime.Parse(start);
+            appointment.AppointmentDateEnd = DateTime.Parse(end);
+            appointmentService.CreateAppointment(appointment, out _);
+
+            return Ok("Appointment has been created");
+        } 
+        catch (Exception ex)
+        {
+            return BadRequest("Failed to update appointment " + ex.Message);
+
+        }
+    }
+*/
+    [Authorize]
+    [HttpGet("patientid/{patientid}/doctorid/{doctorid}/departmentid/{departmentid}/hospitalid/{hospitalid}/start/{start}/end/{end}")]
+    public bool CreateAppointment(int patientid, int doctorid, int departmentid, int hospitalid, string start, string end)
+    {
+        return appointmentService.CreateAppointment(patientid, doctorid, departmentid, hospitalid, start, end, out _);
+    }
+
+    [Authorize]
+    [HttpGet("cpr/{cpr}/place/{place}/start/{start}/end/{end}")]
+    public bool SendAppointmentInformation(string cpr, string place, string start, string end)
+    {
+        return appointmentService.SendAppointmentInformation(cpr, place, start, end);
     }
 
     [Authorize]
