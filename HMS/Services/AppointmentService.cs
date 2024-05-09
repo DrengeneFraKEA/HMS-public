@@ -203,7 +203,7 @@ namespace HMS.Services
             Database.MySQLContext mysql = new Database.MySQLContext(Database.MySqlAccountType.ReadWrite);
             mysql.Db.Open();
 
-            var command = new MySqlCommand("SELECT * FROM hms3.persondata WHERE cpr = @cpr;", mysql.Db);
+            var command = new MySqlCommand("SELECT * FROM hms.persondata WHERE cpr = @cpr;", mysql.Db);
             command.Parameters.AddWithValue("@cpr", cpr);
 
             using (var reader = command.ExecuteReader())
