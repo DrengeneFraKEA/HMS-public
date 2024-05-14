@@ -29,46 +29,7 @@ public class AppointmentController : ControllerBase
     {
         return JsonSerializer.Serialize(appointmentService.GetAppointmentsByPatientId(patientId));
     }
-/*
-    [Authorize]
-    [HttpGet]
-    public IActionResult CreateAppointment([FromBody]Models.Appointment appointment)
-    {
-        try
-        {
-            appointmentService.CreateAppointment(appointment, out _);
-            return Ok("Appointment created successfully");
-        }
-        catch (Exception ex) 
-        {
-            return BadRequest("Failed to create appointment "+ex.Message);
-        }
-    }
 
-    [Authorize]
-    [HttpGet("patientid/{patientid}/doctorid/{doctorid}/departmentid/{departmentid}/hospitalid/{hospitalid}/appointmentdate/{appointmentdate}/appointmentdateend/{appointmentdateend}")]
-    public IActionResult CreateAppointment(int patientid, int doctorid, int departmentid, int hospitalid, string start, string end)
-    {
-        try
-        {
-            Models.Appointment appointment = new Models.Appointment();
-            appointment.PatientId = patientid;
-            appointment.DoctorId = doctorid;
-            appointment.DepartmentId = departmentid;
-            appointment.HospitalId = hospitalid;
-            appointment.AppointmentDate = DateTime.Parse(start);
-            appointment.AppointmentDateEnd = DateTime.Parse(end);
-            appointmentService.CreateAppointment(appointment, out _);
-
-            return Ok("Appointment has been created");
-        } 
-        catch (Exception ex)
-        {
-            return BadRequest("Failed to update appointment " + ex.Message);
-
-        }
-    }
-*/
     [Authorize]
     [HttpGet("patientid/{patientid}/doctorid/{doctorid}/departmentid/{departmentid}/hospitalid/{hospitalid}/start/{start}/end/{end}")]
     public bool CreateAppointment(int patientid, int doctorid, int departmentid, int hospitalid, string start, string end)

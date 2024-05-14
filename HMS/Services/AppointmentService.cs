@@ -154,38 +154,6 @@ namespace HMS.Services
 
             mysql.Db.Close();
 
-            /*
-            // MongoDB
-            Database.MongoDbContext mdbc = new Database.MongoDbContext();
-            MongoClient mc = new MongoClient(mdbc.ConnectionString);
-
-            var database = mc.GetDatabase("HMS");
-            var appointmentCollection = database.GetCollection<Models.Appointment>("appointments");
-
-
-            appointmentCollection.InsertOne(appointment);
-
-            // Neo4j
-            Database.GraphQlContext gdbc = new Database.GraphQlContext();
-            var session = gdbc.Neo4jDriver.Session();
-            string place = appointment.Clinic?.Name != null ? appointment.Clinic.Name : appointment.Hospital.Name;
-            var createAppointment = session.ExecuteWrite(tx =>
-            {
-                var res = tx.Run($@"CREATE (a:Appointment {{ 
-                    appointment_id: {appointment.AppointmentId}, 
-                    appointment_date: '{DateTime.Parse(appointment.AppointmentDate.ToString())}', 
-                    appointment_date_end: '{DateTime.Parse(appointment.AppointmentDateEnd.ToString())}', 
-                    place: '{place}'
-                        }}) 
-                    WITH a 
-                    MATCH (p:Patient {{patient_id: {appointment.Patient.PatientId}}}) 
-                    MATCH (d:Doctor {{doctor_id: {appointment.DoctorId}}}) 
-                    CREATE (p)-[:SCHEDULED_FOR]->(a)<-[:SCHEDULED_FOR]-(d)");
-
-                return res;
-            });
-            */
-
             return true;
         }
 
@@ -232,24 +200,31 @@ namespace HMS.Services
 
                     var jsonData = JsonSerializer.Serialize(requestData);
 
-                    using (var httpClient = new HttpClient())
+                    try 
                     {
-                        var url = "http://localhost:8080/send-email"; // Replace with the URL of your Node.js server
-                        var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-
-                        var responseTask = httpClient.PostAsync(url, content);
-                        responseTask.Wait(); // Wait for the response
-
-                        var response = responseTask.Result;
-
-                        if (response.IsSuccessStatusCode)
+                        using (var httpClient = new HttpClient())
                         {
-                            return true;
+                            var url = "http://localhost:8080/send-email"; // Replace with the URL of your Node.js server
+                            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                            var responseTask = httpClient.PostAsync(url, content);
+                            responseTask.Wait(); // Wait for the response
+
+                            var response = responseTask.Result;
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
                         }
-                        else
-                        {
-                            return false;
-                        }
+                    }
+                    catch(Exception e) 
+                    {
+                        return false;
                     }
                 }
                 else

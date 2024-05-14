@@ -17,7 +17,8 @@ export class Rating extends Component {
                 text: '',
                 score: '',
                 uuid: ''
-            }
+            },
+            submissionMessage: ''
         };
     }
 
@@ -33,7 +34,9 @@ export class Rating extends Component {
             });
         }
         catch (error) {
-            console.error('Error fetching ratings: ', error);
+            this.setState({
+                submissionMessage: 'Kan ikke oprette forbindelse til Rating'
+            });
         }
     }
 
@@ -69,11 +72,15 @@ export class Rating extends Component {
                     text: '',
                     score: '',
                     uuid: ''
-                }
+                },
+                submissionMessage: 'Rating sendt!'
             });
             this.fetchRatings();
         } catch (error) {
             console.error('Error creating rating:', error);
+            this.setState({
+                submissionMessage: 'Rating indsendelse fejlede!'
+            });
         }
     }
 
@@ -99,27 +106,37 @@ export class Rating extends Component {
                     text: '',
                     score: '',
                     uuid: ''
-                }
+                },
+                submissionMessage: 'Rating opdateret'
             });
             this.fetchRatings();
 
 
         } catch (error) {
             console.error('Error updating rating:', error);
+            this.setState({
+                submissionMessage: 'Rating opdatering fejlede.'
+            });
         }
     }
 
     handleDeleteRating = async (ratingId) => {
         try {
             await axios.post(`http://localhost:8090/api/rating/${ratingId}/delete`);
+            this.setState({
+                submissionMessage: 'Rating slettet!'
+            });
             this.fetchRatings();
         } catch (error) {
             console.error('Error deleting rating:', error);
+            this.setState({
+                submissionMessage: 'Sletning af rating fejlede.'
+            });
         }
     }
 
     render() {
-        const { ratings, newRating } = this.state;
+        const { ratings, newRating, submissionMessage } = this.state;
 
         return (
             <>
@@ -140,6 +157,7 @@ export class Rating extends Component {
                             <input type="text" name="score" value={newRating.score} onChange={this.handleInputChange} placeholder="Indtast en score" />
                         </div>
                         <button type="submit">Submit Rating</button>
+                        <div>{submissionMessage}</div>
                     </form>
                     <ul>
                         {ratings.map((rating) => (

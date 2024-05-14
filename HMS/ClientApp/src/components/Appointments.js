@@ -6,6 +6,8 @@ import '../styling/navbar.css';
 
 export class Appointments extends Component {
     static displayName = Appointments.name;
+
+
     constructor(props) {
         super(props);
         this.state = {
@@ -21,13 +23,10 @@ export class Appointments extends Component {
         };
     }
 
-    
-
     componentDidMount() {
         // Check if user is logged in.
         var token = localStorage.getItem("token");
-        if (token === "")
-        {
+        if (token === "") {
             window.location.href = '/';
             return;
         }
@@ -144,16 +143,14 @@ export class Appointments extends Component {
         const userData = {
             userid: localStorage.getItem('userid')
         };
-        const doctor_id = 31;
-        const department_id = 1;
-        const hospital_id = 1;
+
         // Merge additional info
         let updatedAppointment = {
             ...newAppointment,
             patient_id: userData.userid,
-            doctor_id: doctor_id,
-            department_id: department_id,
-            hospital_id: hospital_id
+            doctor_id: 31,
+            department_id: 1,
+            hospital_id: 1
         };
 
         var request = "appointment/patientid/" + updatedAppointment.patient_id +
@@ -164,8 +161,8 @@ export class Appointments extends Component {
             "/end/" + updatedAppointment.end;
 
         try {
-                await axios.get(request, {
-                    headers: { Authorization: localStorage.getItem('token') }
+            await axios.get(request, {
+                headers: { Authorization: localStorage.getItem('token') }
             });
 
             this.handleSendDataForSMTP();
@@ -181,18 +178,24 @@ export class Appointments extends Component {
         const { searchQuery } = this.state;
 
         var request = "appointment/cpr/" + searchQuery +
-        "/place/" + newAppointment.place +
-        "/start/" + newAppointment.start +
-        "/end/" + newAppointment.end; 
+            "/place/" + newAppointment.place +
+            "/start/" + newAppointment.start +
+            "/end/" + newAppointment.end;
 
         try {
-            await axios.get(request, {
+            const response = await axios.get(request, {
                 headers: { Authorization: localStorage.getItem('token') }
             });
 
+            if (response.data === true) {
+                this.setState({ errorMessage: "Email sendt til patient!" });
+            } else
+            {
+                this.setState({ errorMessage: "Kunne ikke oprette forbindelse til Email serveren." });
+            }
 
         } catch (error) {
-            console.log('Error sending new appointment information: ', error);
+            this.setState({ errorMessage: "Kunne ikke oprette forbindelse til Email serveren." });
         }
     }
 
@@ -203,6 +206,9 @@ export class Appointments extends Component {
 
     render() {
         const { appointments, editingAppointments, newAppointment, searchQuery, searchResult } = this.state;
+
+        // Define options for the dropdown
+        const placeOptions = ["Kobenhavn Sundhedshus"];
 
         return (
             <>
@@ -218,12 +224,16 @@ export class Appointments extends Component {
                         </div>
                         <div className="appointment-item">
                             <div className="column">
-                                <input
-                                    type="text"
+                                <select
                                     value={newAppointment.place}
                                     onChange={(e) => this.setState({ newAppointment: { ...newAppointment, place: e.target.value } })}
-                                    placeholder="Sted"
-                                />
+                                >
+                                    {placeOptions.map((option, index) => (
+                                        <option key={index} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="column">
                                 <input
@@ -258,7 +268,9 @@ export class Appointments extends Component {
                                 )}
                                 <div style={{ marginTop: '10px' }}></div>
                                 <button onClick={this.handleSearchClick}>Tilknyt patient</button>
-                                <button onClick={this.handleAddAppointment}>Tilføj</button>
+                                <button onClick={this.handleAddAppointment}>Tilfoj</button>
+
+                                {this.state.errorMessage && <p>{this.state.errorMessage}</p>}
                             </div>
                         </div>
                         {appointments.map(appointment => (
