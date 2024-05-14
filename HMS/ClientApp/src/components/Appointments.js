@@ -178,7 +178,7 @@ export class Appointments extends Component {
         const { searchQuery } = this.state;
 
         var request = "appointment/cpr/" + searchQuery +
-            "/place/" + newAppointment.place +
+            "/place/" + "København Sundhedshus" +
             "/start/" + newAppointment.start +
             "/end/" + newAppointment.end;
 
