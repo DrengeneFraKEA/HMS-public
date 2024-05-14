@@ -35,8 +35,6 @@ namespace HMS.Data
                                      routingKey: _queueName,
                                      basicProperties: null,
                                      body: body);
-
-                Console.WriteLine(" [x] Sent {0}", message);
             }
         }
     }

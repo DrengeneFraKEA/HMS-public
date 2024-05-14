@@ -55,7 +55,7 @@ namespace HMS.Services
 
             mysql.Db.Open();
 
-            var command = new MySqlCommand($"SELECT * FROM personData WHERE cpr = {cpr};", mysql.Db);
+            var command = new MySqlCommand($"SELECT * FROM persondata WHERE cpr = {cpr};", mysql.Db);
             var reader = command.ExecuteReader();
             exists = reader.HasRows;
 

@@ -97,18 +97,14 @@ export class Prescriptions extends Component {
 
     SendPrescriptionButtonClicked = async () => {
         const { currentCPR, searchResults } = this.state;
-        console.log("CPR from previous prescription:", currentCPR);
 
         const selectedDrug = searchResults.find(drug => drug.Id === this.state.prescriptions[this.state.prescriptions.length - 1].selectedDrugId);
-        console.log("Current selected drug:", selectedDrug);
 
         try {
             const response = await axios.post("drug/prescribe", {
                 cpr: currentCPR,
                 drug: selectedDrug
             });
-
-            console.log(response)
 
             if (response.data === true) {
                 this.setState({ prescriptionStatus: 'Recept modtaget!' });
