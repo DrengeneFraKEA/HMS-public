@@ -21,8 +21,9 @@ export class Rating extends Component {
             submissionMessage: ''
         };
     }
-
+    uuidG = '';
     componentDidMount() {
+        this.uuidG = uuidv4();
         this.fetchRatings();
     }
 
@@ -56,7 +57,7 @@ export class Rating extends Component {
             const { doctorName, title, text, score } = this.state.newRating;
 
             const newRatingWithUUID = {
-                uuid: uuidv4(),
+                uuid: this.uuidG,
                 doctorName,
                 title,
                 text,
@@ -89,7 +90,7 @@ export class Rating extends Component {
             const { doctorName, title, text, score } = this.state.newRating;
 
             const newRatingWithUUID = {
-                uuid: uuidv4(),
+                uuid: this.uuidG,
                 rating: { id: ratingId },
                 doctorName,
                 title,
